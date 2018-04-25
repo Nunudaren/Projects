@@ -1,0 +1,15 @@
+.settings
+target/
+.classpath
+.project
+.idea/
+.cache
+.node_modules/
+*.iml
+out/
+.DS_Store
+build.log
+.swp
+rebel.xml
+node_modules
+/.idea/
