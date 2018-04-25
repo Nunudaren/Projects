@@ -20,7 +20,7 @@
     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
         <property name="driverClassName" value="${mysql.driver}"/>
         <property name="url"
-                  value="jdbc:mysql://${mysql.address.apiapply}/credittools?useUnicode=true&amp;characterEncoding=utf8"/>
+                  value="jdbc:mysql://${mysql.address.apiapply}/apiapply?useUnicode=true&amp;characterEncoding=utf8"/>
         <property name="username" value="${mysql.username.apiapply}"/>
         <property name="password" value="${mysql.password.apiapply}"/>
         <property name="initialSize" value="${jdbc.connection.initialSize}"/>
@@ -107,19 +107,6 @@
         <constructor-arg value="${url.confplus}"/>
     </bean>
 
-    <bean class="cn.caijiajia.loanutil.pipeline.PipelineMapper" id="pipelineMapper">
-        <!--PipelineTask 表对应的 mapper-->
-        <constructor-arg name="taskMapperClassName" value="cn.caijiajia.apiapply.mapper.PipelineTaskMapper"/>
-        <!--PipelineProcess 表对应的 mapper-->
-        <constructor-arg name="processMapperClassName" value="cn.caijiajia.apiapply.mapper.PipelineProcessMapper"/>
-        <!-- 事务管理器 -->
-        <constructor-arg name="txManager" ref="transactionManager"/>
-    </bean>
-
-    <bean class="cn.caijiajia.loanutil.pipeline.PipelineTaskFactory" id="pipelineTaskFactory">
-        <constructor-arg name="pipelineMapper" ref="pipelineMapper"/>
-    </bean>
-
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
             <value>classpath:spring-config.properties</value>
@@ -143,21 +130,4 @@
         <ref bean="jobExecutorRegister"/>
     </util:list>
 
-    <bean id="s3Service" class="cn.caijiajia.awsservice.S3Service">
-        <constructor-arg value="${aws.s3.accessKey}"/>
-        <constructor-arg value="${aws.s3.secretKey}"/>
-    </bean>
-
-    <bean id="s3StoreService" class="cn.caijiajia.s3util.mapper.S3StoreService" lazy-init="true">
-        <property name="s3StoreBucketName" value="${aws.s3.bucketName.apiapply}"/>
-        <property name="s3StoreBucketNameInc" value="${aws.s3.bucketName.creditdataInc}"/>
-    </bean>
-    <bean id="dataStoreMapper"
-          class="cn.caijiajia.s3util.mapper.S3BoStoreMapper"
-          lazy-init="true">
-    </bean>
-    <bean id="s3StoreMapper"
-          class="cn.caijiajia.s3util.mapper.S3StoreMapper"
-          lazy-init="true">
-    </bean>
 </beans>
