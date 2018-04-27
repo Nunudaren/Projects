@@ -20,9 +20,9 @@
     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
         <property name="driverClassName" value="${mysql.driver}"/>
         <property name="url"
-                  value="jdbc:mysql://${mysql.address.apiapply}/apiapply?useUnicode=true&amp;characterEncoding=utf8"/>
-        <property name="username" value="${mysql.username.apiapply}"/>
-        <property name="password" value="${mysql.password.apiapply}"/>
+                  value="jdbc:mysql://${mysql.address.credittools}/credittools?useUnicode=true&amp;characterEncoding=utf8"/>
+        <property name="username" value="${mysql.username.credittools}"/>
+        <property name="password" value="${mysql.password.credittools}"/>
         <property name="initialSize" value="${jdbc.connection.initialSize}"/>
         <property name="minIdle" value="${jdbc.connection.minIdle}"/>
         <property name="maxActive" value="${jdbc.connection.maxActive}"/>
