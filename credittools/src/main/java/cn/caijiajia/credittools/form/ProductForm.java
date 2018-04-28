@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 /**
  * Created by liujianyang on 2018/4/27.
@@ -35,6 +34,7 @@ public class ProductForm {
     private String productId;
     @NotBlank
     private String name;
+    @NotBlank
     private String iconUrl;
     private String mark;
     private Integer minAmount;
@@ -42,6 +42,7 @@ public class ProductForm {
     private String feeRate;
     private String lendPeriod;
     private Boolean showFeeRate;
+    @NotBlank
     private String promotion;
     @NotBlank
     private String jumpUrl;
@@ -54,9 +55,12 @@ public class ProductForm {
     private Double passRate;
     private Boolean amountFirst;
 
-    public void checkField(){
-        if(name.length() > 7 || (StringUtils.isNotEmpty(mark) && mark.length() > 7)){
-            throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG);
+    public void checkField() {
+        if (name.length() > 7 || (StringUtils.isNotEmpty(mark) && mark.length() > 7)) {
+            throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, String.format(ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG, 7));
+        }
+        if (promotion.length() > 24) {
+            throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, String.format(ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG, 24));
         }
     }
 }

@@ -2,11 +2,9 @@ package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.form.ProductForm;
 import cn.caijiajia.credittools.service.LoanProductService;
+import cn.caijiajia.credittools.vo.ProductVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author:chendongdong
@@ -22,6 +20,11 @@ public class LoanProductController {
     public void addOrUpdateProduct(@RequestBody ProductForm productForm) {
         productForm.checkField();
         loanProductService.addOrUpdateProduct(productForm);
+    }
+
+    @RequestMapping(value = "/product/{id}", method = RequestMethod.GET)
+    public ProductVo getProduct(@PathVariable Integer id){
+        return loanProductService.getProductVoById(id);
     }
 
 }
