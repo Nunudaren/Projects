@@ -10,7 +10,7 @@
 
     <name>CaiJiaJia credittools-rpc</name>
     <artifactId>credittools-rpc</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>${project.release.version}</version>
 
     <dependencies>

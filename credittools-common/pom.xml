@@ -10,7 +10,7 @@
 
     <name>CaiJiaJia credittools-common</name>
     <artifactId>credittools-common</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>${project.release.version}</version>
 
     <properties>

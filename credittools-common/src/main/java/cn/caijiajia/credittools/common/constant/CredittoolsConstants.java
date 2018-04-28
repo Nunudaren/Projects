@@ -5,5 +5,5 @@ package cn.caijiajia.credittools.common.constant;
  */
 public class CredittoolsConstants {
 
-
+    public static final String SPLIT_MARK = ",";
 }
