@@ -14,5 +14,7 @@ package cn.caijiajia.credittools.common.constant;
  */
 public class ErrorResponseConstants {
 
+    public static final int FIELD_LENGTH_EXCESS_CODE=6000;
+    public static final String FIELD_LENGTH_EXCESS_MSG="产品名称字段或者角标字段长度超过指定长度（指定长度7）";
 
 }
