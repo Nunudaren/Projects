@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Created by liujianyang on 2018/4/27.
@@ -29,13 +30,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ProductForm {
 
-    private String id;
+    private Integer id;
 
     private String productId;
     @NotBlank
     private String name;
-    private String onLineTime;
-    private String offLineTime;
     private String iconUrl;
     private String mark;
     private Integer minAmount;
@@ -50,12 +49,12 @@ public class ProductForm {
     @NotNull
     private Double annualRate;
     @NotNull
-    private Integer lendTime;
+    private Double lendTime;
     @NotNull
-    private Integer passRate;
-    private String amountFirst;
+    private Double passRate;
+    private Boolean amountFirst;
 
-    public void valid(){
+    public void checkField(){
         if(name.length() > 7 || (StringUtils.isNotEmpty(mark) && mark.length() > 7)){
             throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG);
         }

@@ -20,7 +20,7 @@ public class LoanProductController {
 
     @RequestMapping(value = "/product", method = RequestMethod.POST)
     public void addOrUpdateProduct(@RequestBody ProductForm productForm) {
-        productForm.valid();
+        productForm.checkField();
         loanProductService.addOrUpdateProduct(productForm);
     }
 
