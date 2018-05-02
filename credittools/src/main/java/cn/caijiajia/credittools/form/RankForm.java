@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @Author:chendongdong
@@ -13,10 +16,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoanProductListForm {
+public class RankForm {
+    @NotEmpty
     private String productId;
-    private String productName;
-    private String status;//上线/下线
-    private int pageNo;
-    private int pageSize;
+    @NotNull
+    private int currentRank;
+    @NotNull
+    private int changedRank;
 }

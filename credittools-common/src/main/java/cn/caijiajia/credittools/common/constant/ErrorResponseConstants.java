@@ -19,6 +19,14 @@ public class ErrorResponseConstants {
 
     public static final int PRODUCT_NOT_FOUND_CODE=6001;
     public static final String PRODUCT_NOT_FOUND_MSG="没有找到产品";
+    public static final Integer GET_PRODUCT_NOT_EXIST_CODE = 0001;
+    public static final String GET_PRODUCT_NOT_EXIST_MSG = "不存在该贷款产品";
+
+    public static final Integer CHANGE_PRODUCT_RANK_FAILED_CODE = 0002;
+    public static final String CHANGE_PRODUCT_RANK_FAILED_MSG = "更改产品位置序号失败";
+
+    public static final Integer CHANGE_PRODUCT_STATUS_FAILED_CODE = 0003;
+    public static final String CHANGE_PRODUCT_STATUS_FAILED_MSG = "更改产品上下线状态失败";
 
     public static final int ERR_RESX_UPLOAD_FAILURE_CODE = 9458;
     public static final String ERR_RESX_UPLOAD_FAILURE_MSG = "资源上传失败！";

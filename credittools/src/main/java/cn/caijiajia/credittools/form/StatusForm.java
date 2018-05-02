@@ -4,19 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @Author:chendongdong
- * @Date:2018/4/27
+ * @Date:2018/4/28
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoanProductListForm {
+public class StatusForm {
+    @NotBlank
     private String productId;
-    private String productName;
-    private String status;//上线/下线
-    private int pageNo;
-    private int pageSize;
+
+    @NotBlank
+    private String status;
 }
