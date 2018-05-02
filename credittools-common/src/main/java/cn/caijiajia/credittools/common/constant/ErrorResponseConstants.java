@@ -20,4 +20,7 @@ public class ErrorResponseConstants {
     public static final int PRODUCT_NOT_FOUND_CODE=6001;
     public static final String PRODUCT_NOT_FOUND_MSG="没有找到产品";
 
+    public static final int ERR_RESX_UPLOAD_FAILURE_CODE = 9458;
+    public static final String ERR_RESX_UPLOAD_FAILURE_MSG = "资源上传失败！";
+
 }

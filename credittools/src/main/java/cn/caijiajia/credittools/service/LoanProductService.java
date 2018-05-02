@@ -1,5 +1,6 @@
 package cn.caijiajia.credittools.service;
 
+import cn.caijiajia.cloud.service.FileUploadService;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.constant.PaginationContext;
@@ -11,22 +12,30 @@ import cn.caijiajia.credittools.form.ProductForm;
 import cn.caijiajia.credittools.mapper.ProductMapper;
 import cn.caijiajia.credittools.vo.ProductVo;
 import cn.caijiajia.framework.exceptions.CjjClientException;
+import cn.caijiajia.framework.exceptions.CjjServerException;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author:chendongdong
  * @Date:2018/4/27
  */
 @Service
+@Slf4j
 public class LoanProductService {
 
     @Autowired
@@ -34,6 +43,9 @@ public class LoanProductService {
 
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     /**
      * @param loanProductListForm
@@ -108,6 +120,19 @@ public class LoanProductService {
         BeanUtils.copyProperties(product, productVo);
         productVo.setTags(tagList);
         return productVo;
+    }
+
+    public String uploadImg(MultipartFile file) throws Exception  {
+
+        String serial = UUID.randomUUID().toString();
+        String fileName = "LP_ICON_" + serial + ".png";
+        String imgUrl;
+        try {
+            imgUrl = fileUploadService.uploadFile(fileName, Base64.decodeBase64(file.getContentType()));
+        } catch (FileUploadException e) {
+            throw new CjjServerException(ErrorResponseConstants.ERR_RESX_UPLOAD_FAILURE_CODE, ErrorResponseConstants.ERR_RESX_UPLOAD_FAILURE_MSG, e);
+        }
+        return imgUrl;
     }
 
 }
