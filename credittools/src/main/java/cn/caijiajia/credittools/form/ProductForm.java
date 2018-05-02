@@ -46,6 +46,7 @@ public class ProductForm {
     private String promotion;
     @NotBlank
     private String jumpUrl;
+    @NotBlank
     private String tags;
     @NotNull
     private Double annualRate;

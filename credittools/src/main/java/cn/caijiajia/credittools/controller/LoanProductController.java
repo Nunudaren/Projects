@@ -7,11 +7,13 @@ import cn.caijiajia.credittools.form.RankForm;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
 import cn.caijiajia.credittools.vo.ProductVo;
+import cn.caijiajia.credittools.vo.TagVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author:chendongdong
@@ -61,5 +63,14 @@ public class LoanProductController {
     @RequestMapping(value = "/changeProductRank", method = RequestMethod.POST)
     public void ChangeRankByProductId(@RequestBody RankForm rankForm) {
         loanProductService.upateRankByProductId(rankForm);
+    }
+
+    /**
+     *
+     * 获取使用到的标签
+     */
+    @RequestMapping(value = "/usedTag", method = RequestMethod.GET)
+    public Set<TagVo> getUsedTags(){
+        return loanProductService.getUsedTags();
     }
 }

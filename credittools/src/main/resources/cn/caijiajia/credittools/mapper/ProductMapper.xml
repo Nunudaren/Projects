@@ -22,7 +22,7 @@
     <result column="promotion" jdbcType="VARCHAR" property="promotion" />
     <result column="jump_url" jdbcType="VARCHAR" property="jumpUrl" />
     <result column="rank" jdbcType="INTEGER" property="rank" />
-    <result column="tagId" jdbcType="VARCHAR" property="tagid" />
+    <result column="tags" jdbcType="VARCHAR" property="tags" />
     <result column="annual_rate" jdbcType="DOUBLE" property="annualRate" />
     <result column="lend_time" jdbcType="DOUBLE" property="lendTime" />
     <result column="pass_rate" jdbcType="DOUBLE" property="passRate" />
@@ -103,7 +103,7 @@
     -->
     `id`, `product_id`, `name`, `onLineTime`, `offLineTime`, `status`, `icon_url`, `mark`, 
     `min_amount`, `max_amount`, `fee_rate`, `lend_period`, `show_fee_rate`, `promotion`, 
-    `jump_url`, `rank`, `tagId`, `annual_rate`, `lend_time`, `pass_rate`, `aomount_first`, 
+    `jump_url`, `rank`, `tags`, `annual_rate`, `lend_time`, `pass_rate`, `aomount_first`, 
     `created_at`, `updated_at`
   </sql>
   <select id="selectByExample" parameterType="cn.caijiajia.credittools.domain.ProductExample" resultMap="BaseResultMap">
@@ -189,8 +189,8 @@
       <if test="rank != null">
         `rank`,
       </if>
-      <if test="tagid != null">
-        `tagId`,
+      <if test="tags != null">
+        `tags`,
       </if>
       <if test="annualRate != null">
         `annual_rate`,
@@ -260,8 +260,8 @@
       <if test="rank != null">
         #{rank,jdbcType=INTEGER},
       </if>
-      <if test="tagid != null">
-        #{tagid,jdbcType=VARCHAR},
+      <if test="tags != null">
+        #{tags,jdbcType=VARCHAR},
       </if>
       <if test="annualRate != null">
         #{annualRate,jdbcType=DOUBLE},
@@ -348,8 +348,8 @@
       <if test="record.rank != null">
         `rank` = #{record.rank,jdbcType=INTEGER},
       </if>
-      <if test="record.tagid != null">
-        `tagId` = #{record.tagid,jdbcType=VARCHAR},
+      <if test="record.tags != null">
+        `tags` = #{record.tags,jdbcType=VARCHAR},
       </if>
       <if test="record.annualRate != null">
         `annual_rate` = #{record.annualRate,jdbcType=DOUBLE},
@@ -396,7 +396,7 @@
       `promotion` = #{record.promotion,jdbcType=VARCHAR},
       `jump_url` = #{record.jumpUrl,jdbcType=VARCHAR},
       `rank` = #{record.rank,jdbcType=INTEGER},
-      `tagId` = #{record.tagid,jdbcType=VARCHAR},
+      `tags` = #{record.tags,jdbcType=VARCHAR},
       `annual_rate` = #{record.annualRate,jdbcType=DOUBLE},
       `lend_time` = #{record.lendTime,jdbcType=DOUBLE},
       `pass_rate` = #{record.passRate,jdbcType=DOUBLE},
@@ -459,8 +459,8 @@
       <if test="rank != null">
         `rank` = #{rank,jdbcType=INTEGER},
       </if>
-      <if test="tagid != null">
-        `tagId` = #{tagid,jdbcType=VARCHAR},
+      <if test="tags != null">
+        `tags` = #{tags,jdbcType=VARCHAR},
       </if>
       <if test="annualRate != null">
         `annual_rate` = #{annualRate,jdbcType=DOUBLE},

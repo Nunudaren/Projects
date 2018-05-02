@@ -3,6 +3,7 @@ package cn.caijiajia.credittools.service;
 import cn.caijiajia.cloud.service.FileUploadService;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductExample;
 import cn.caijiajia.credittools.domain.Tag;
@@ -10,11 +11,12 @@ import cn.caijiajia.credittools.form.LoanProductListForm;
 import cn.caijiajia.credittools.form.ProductForm;
 import cn.caijiajia.credittools.mapper.ProductMapper;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
+import cn.caijiajia.credittools.vo.TagVo;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.exceptions.CjjServerException;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileUploadException;
 import cn.caijiajia.credittools.form.RankForm;
 import cn.caijiajia.credittools.form.StatusForm;
@@ -23,6 +25,7 @@ import cn.caijiajia.credittools.vo.ProductVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Lists;
+import org.assertj.core.util.Sets;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -32,10 +35,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @Author:chendongdong
@@ -44,6 +44,9 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class LoanProductService {
+
+    @Autowired
+    private Configs configs;
 
     @Autowired
     private ProductMapper productMapper;
@@ -221,7 +224,7 @@ public class LoanProductService {
         if (product == null) {
             throw new CjjClientException(ErrorResponseConstants.PRODUCT_NOT_FOUND_CODE, ErrorResponseConstants.PRODUCT_NOT_FOUND_MSG);
         }
-        String tagId = product.getTagid();
+        String tagId = product.getTags();
         List<String> tags = Lists.newArrayList(tagId.split(CredittoolsConstants.SPLIT_MARK));
         List<ProductVo.Tag> tagList = Lists.newArrayList();
         for (String tag : tags) {
@@ -249,6 +252,40 @@ public class LoanProductService {
             throw new CjjServerException(ErrorResponseConstants.ERR_RESX_UPLOAD_FAILURE_CODE, ErrorResponseConstants.ERR_RESX_UPLOAD_FAILURE_MSG, e);
         }
         return imgUrl;
+    }
+
+    public Set<TagVo> getUsedTags(){
+        Set<TagVo> set = Sets.newHashSet();
+//        String tagsstr = "{\n" +
+//                "  \"1\": \"用芝麻分贷款\",\n" +
+//                "  \"2\": \"大额贷款\",\n" +
+//                "  \"3\": \"低门槛\",\n" +
+//                "  \"4\": \"不查征信\",\n" +
+//                "  \"5\": \"凭身份证可贷\",\n" +
+//                "  \"6\": \"代还信用卡\",\n" +
+//                "  \"7\": \"小额极速贷\",\n" +
+//                "  \"8\": \"新用户有优惠\"\n" +
+//                "}";
+//        Map<String, String> tags = JSON.parseObject(tagsstr, Map.class);
+        Map<String, String> tags = configs.getTags();
+        ProductExample productExample = new ProductExample();
+        productExample.createCriteria().andStatusEqualTo(true);
+        List<Product> products = productMapper.selectByExample(productExample);
+        if(CollectionUtils.isNotEmpty(products)){
+            for (Product product : products) {
+                List<String> tagids = Lists.newArrayList(product.getTags().split(","));
+                for (String tagid: tagids) {
+                    if(tags.containsKey(tagid)){
+                        set.add(TagVo.builder()
+                                .tagId(Integer.valueOf(tagid))
+                                .tagName(tags.get(tagid))
+                                .build());
+                    }
+                }
+            }
+        }
+
+        return set;
     }
 
 }
