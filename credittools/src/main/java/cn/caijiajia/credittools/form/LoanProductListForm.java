@@ -17,6 +17,6 @@ public class LoanProductListForm {
     private String productId;
     private String productName;
     private String status;//上线/下线
-    private int pageNo;
-    private int pageSize;
+    private Integer pageNo;
+    private Integer pageSize;
 }

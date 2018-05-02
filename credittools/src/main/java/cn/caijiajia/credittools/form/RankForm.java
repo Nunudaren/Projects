@@ -20,7 +20,7 @@ public class RankForm {
     @NotEmpty
     private String productId;
     @NotNull
-    private int currentRank;
+    private Integer currentRank;
     @NotNull
-    private int changedRank;
+    private Integer changedRank;
 }
