@@ -33,6 +33,11 @@ public class LoanProductController {
         return loanProductService.getProductVoById(id);
     }
 
+    /**
+     * 按条件查询产品列表
+     * @param loanProductListForm
+     * @return
+     */
     @RequestMapping(value = "/getProductList", method = RequestMethod.POST)
     public List<LoanProductListVo> getProductList(@RequestBody LoanProductListForm loanProductListForm) {
         return loanProductService.getProductList(loanProductListForm);
@@ -43,6 +48,10 @@ public class LoanProductController {
         return loanProductService.getProductRankById(productId);
     }
 
+    /**
+     * 修改产品的展示位置
+     * @param rankForm
+     */
     @RequestMapping(value = "/changeProductRank", method = RequestMethod.POST)
     public void ChangeRankByProductId(@RequestBody RankForm rankForm) {
         loanProductService.upateRankByProductId(rankForm);
