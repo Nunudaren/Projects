@@ -2,22 +2,31 @@ package cn.caijiajia.credittools.service;
 
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
-import cn.caijiajia.credittools.constant.PaginationContext;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductExample;
 import cn.caijiajia.credittools.domain.Tag;
 import cn.caijiajia.credittools.form.LoanProductListForm;
 import cn.caijiajia.credittools.form.ProductForm;
 import cn.caijiajia.credittools.mapper.ProductMapper;
-import cn.caijiajia.credittools.vo.ProductVo;
+import cn.caijiajia.credittools.vo.LoanProductListVo;
 import cn.caijiajia.framework.exceptions.CjjClientException;
+import cn.caijiajia.credittools.form.RankForm;
+import cn.caijiajia.credittools.form.StatusForm;
+import cn.caijiajia.credittools.utils.DateUtil;
+import cn.caijiajia.credittools.vo.ProductVo;
+import cn.caijiajia.framework.exceptions.CjjServerException;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.Date;
 import java.util.List;
@@ -27,6 +36,7 @@ import java.util.List;
  * @Date:2018/4/27
  */
 @Service
+@Slf4j
 public class LoanProductService {
 
     @Autowired
@@ -35,13 +45,18 @@ public class LoanProductService {
     @Autowired
     private TagService tagService;
 
+    private DataSourceTransactionManager txManager;
+
     /**
+     * 按条件查询产品列表
+     *
      * @param loanProductListForm
      * @return
      */
-    public List<Product> getProductList(LoanProductListForm loanProductListForm) {
-        PageHelper.startPage(PaginationContext.getPageNum(), PaginationContext.getPageSize());
+    public List<LoanProductListVo> getProductList(LoanProductListForm loanProductListForm) {
+        PageHelper.startPage(loanProductListForm.getPageNo(), loanProductListForm.getPageSize());
         ProductExample example = new ProductExample();
+        example.setOrderByClause("rank asc");
         ProductExample.Criteria criteria = example.or();
 
         if (StringUtils.isNotEmpty(loanProductListForm.getProductName())) {
@@ -51,10 +66,113 @@ public class LoanProductService {
             criteria.andProductIdIsNotNull().andProductIdEqualTo(loanProductListForm.getProductId());
         }
         if (StringUtils.isNotEmpty(loanProductListForm.getStatus())) {
-            criteria.andStatusIsNotNull().andStatusEqualTo(loanProductListForm.getStatus().equals(1) ? true : false);
+            criteria.andStatusIsNotNull().andStatusEqualTo(loanProductListForm.getStatus().equals("1") ? true : false);
         }
         List<Product> productList = productMapper.selectByExample(example);
-        return productList;
+        List<LoanProductListVo> productVoList = transForm(productList);
+
+        return productVoList;
+    }
+
+    private List<LoanProductListVo> transForm(List<Product> productList) {
+        List<LoanProductListVo> productVoList = Lists.newArrayList();
+        for (Product product : productList) {
+            LoanProductListVo loanProductListVo = LoanProductListVo.builder()
+                    .rank(product.getRank())
+                    .productId(product.getProductId())
+                    .productName(product.getName())
+                    .iconUrl(product.getIconUrl())
+                    .onlineTime(DateUtil.convert2Str(product.getOnlinetime(), DateUtil.NYRSF))
+                    .offlineTime(DateUtil.convert2Str(product.getOfflinetime(), DateUtil.NYRSF))
+                    .status(product.getStatus() ? "1" : "0")//1：上线 0：下线
+                    .build();
+            productVoList.add(loanProductListVo);
+        }
+        return productVoList;
+    }
+
+    /**
+     * 修改产品的展示位置
+     *
+     * @param rankForm
+     */
+    public void upateRankByProductId(RankForm rankForm) {
+        ProductExample example = new ProductExample();
+        ProductExample.Criteria criteria = example.or();
+        if (rankForm.getCurrentRank() == rankForm.getChangedRank()) {
+            return;
+        } else if (rankForm.getCurrentRank() < rankForm.getChangedRank()) {
+            criteria.andRankGreaterThan(rankForm.getCurrentRank()).andRankLessThanOrEqualTo(rankForm.getChangedRank());//--
+        } else {
+            criteria.andRankLessThan(rankForm.getCurrentRank()).andRankGreaterThanOrEqualTo(rankForm.getChangedRank());//++
+        }
+        List<Product> productList = productMapper.selectByExample(example);
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus transactionStatus = txManager.getTransaction(def);
+        try {
+            for (Product record : productList) {
+                Integer rank;
+                if (rankForm.getCurrentRank() < rankForm.getChangedRank()) {
+                    rank = record.getRank() - 1;
+                } else {
+                    rank = record.getRank() + 1;
+                }
+                Product update = new Product();
+                update.setId(record.getId());
+                update.setRank(rank);
+                productMapper.updateByPrimaryKeySelective(update);
+            }
+            Product toUpdate = getProductRankById(rankForm.getProductId());
+            toUpdate.setRank(rankForm.getChangedRank());
+            productMapper.updateByPrimaryKeySelective(toUpdate);
+            txManager.commit(transactionStatus);
+        } catch (Exception e) {
+            txManager.rollback(transactionStatus);
+            if (e instanceof CjjServerException) {
+                log.error("更新产品位置序号失败！");
+                throw new CjjServerException(((CjjServerException) e).getCode(), e.getMessage());
+            }
+            log.error("更新产品位置序号失败！");
+            throw new CjjServerException(ErrorResponseConstants.CHANGE_PRODUCT_RANK_FAILED_CODE, ErrorResponseConstants.CHANGE_PRODUCT_RANK_FAILED_MSG);
+        }
+
+    }
+
+    /**
+     * 更改产品上/下线状态
+     *
+     * @param statusForm
+     */
+    public void updateLineStatus(StatusForm statusForm) {
+        ProductExample example = new ProductExample();
+        example.or().andProductIdEqualTo(statusForm.getProductId());
+        List<Product> productList = productMapper.selectByExample(example);
+        if (CollectionUtils.isNotEmpty(productList)) {
+            if (statusForm.getStatus().equals((productList.get(0).getStatus() ? "1" : "0"))) {
+                log.warn("要修改的状态和当前产品的数据库状态一致，用户可能没有刷新页面");
+                return;
+            }
+            Product update = new Product();
+            update.setStatus(statusForm.getStatus().equals("1") ? true : false);
+            productMapper.updateByPrimaryKeySelective(update);
+        } else {
+            log.error("更新产品位置序号失败！");
+            throw new CjjServerException(ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_CODE, ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_MSG);
+        }
+    }
+
+
+    public Product getProductRankById(String productId) {
+        ProductExample example = new ProductExample();
+        example.or().andProductIdEqualTo(productId);
+        List<Product> products = productMapper.selectByExample(example);
+        if (CollectionUtils.isNotEmpty(products)) {
+            return products.get(0);
+        } else {
+            log.error("产品编号：{}的贷款产品不存在！", productId);
+            throw new CjjServerException(ErrorResponseConstants.GET_PRODUCT_NOT_EXIST_CODE, ErrorResponseConstants.GET_PRODUCT_NOT_EXIST_MSG);
+        }
     }
 
     public void addOrUpdateProduct(ProductForm productForm) {

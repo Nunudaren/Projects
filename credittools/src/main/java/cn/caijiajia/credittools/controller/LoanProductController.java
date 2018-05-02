@@ -1,10 +1,16 @@
 package cn.caijiajia.credittools.controller;
 
+import cn.caijiajia.credittools.domain.Product;
+import cn.caijiajia.credittools.form.LoanProductListForm;
 import cn.caijiajia.credittools.form.ProductForm;
+import cn.caijiajia.credittools.form.RankForm;
 import cn.caijiajia.credittools.service.LoanProductService;
+import cn.caijiajia.credittools.vo.LoanProductListVo;
 import cn.caijiajia.credittools.vo.ProductVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Author:chendongdong
@@ -23,8 +29,22 @@ public class LoanProductController {
     }
 
     @RequestMapping(value = "/product/{id}", method = RequestMethod.GET)
-    public ProductVo getProduct(@PathVariable Integer id){
+    public ProductVo getProduct(@PathVariable Integer id) {
         return loanProductService.getProductVoById(id);
     }
 
+    @RequestMapping(value = "/getProductList", method = RequestMethod.POST)
+    public List<LoanProductListVo> getProductList(@RequestBody LoanProductListForm loanProductListForm) {
+        return loanProductService.getProductList(loanProductListForm);
+    }
+
+    @RequestMapping(value = "/getProductRank", method = RequestMethod.GET)
+    public Product getProductRankById(String productId) {
+        return loanProductService.getProductRankById(productId);
+    }
+
+    @RequestMapping(value = "/changeProductRank", method = RequestMethod.POST)
+    public void ChangeRankByProductId(@RequestBody RankForm rankForm) {
+        loanProductService.upateRankByProductId(rankForm);
+    }
 }
