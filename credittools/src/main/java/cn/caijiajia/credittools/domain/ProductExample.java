@@ -1235,73 +1235,73 @@ public class ProductExample {
             return (Criteria) this;
         }
 
-        public Criteria andTagidIsNull() {
-            addCriterion("`tagId` is null");
+        public Criteria andTagsIsNull() {
+            addCriterion("`tags` is null");
             return (Criteria) this;
         }
 
-        public Criteria andTagidIsNotNull() {
-            addCriterion("`tagId` is not null");
+        public Criteria andTagsIsNotNull() {
+            addCriterion("`tags` is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTagidEqualTo(String value) {
-            addCriterion("`tagId` =", value, "tagid");
+        public Criteria andTagsEqualTo(String value) {
+            addCriterion("`tags` =", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidNotEqualTo(String value) {
-            addCriterion("`tagId` <>", value, "tagid");
+        public Criteria andTagsNotEqualTo(String value) {
+            addCriterion("`tags` <>", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidGreaterThan(String value) {
-            addCriterion("`tagId` >", value, "tagid");
+        public Criteria andTagsGreaterThan(String value) {
+            addCriterion("`tags` >", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidGreaterThanOrEqualTo(String value) {
-            addCriterion("`tagId` >=", value, "tagid");
+        public Criteria andTagsGreaterThanOrEqualTo(String value) {
+            addCriterion("`tags` >=", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidLessThan(String value) {
-            addCriterion("`tagId` <", value, "tagid");
+        public Criteria andTagsLessThan(String value) {
+            addCriterion("`tags` <", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidLessThanOrEqualTo(String value) {
-            addCriterion("`tagId` <=", value, "tagid");
+        public Criteria andTagsLessThanOrEqualTo(String value) {
+            addCriterion("`tags` <=", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidLike(String value) {
-            addCriterion("`tagId` like", value, "tagid");
+        public Criteria andTagsLike(String value) {
+            addCriterion("`tags` like", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidNotLike(String value) {
-            addCriterion("`tagId` not like", value, "tagid");
+        public Criteria andTagsNotLike(String value) {
+            addCriterion("`tags` not like", value, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidIn(List<String> values) {
-            addCriterion("`tagId` in", values, "tagid");
+        public Criteria andTagsIn(List<String> values) {
+            addCriterion("`tags` in", values, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidNotIn(List<String> values) {
-            addCriterion("`tagId` not in", values, "tagid");
+        public Criteria andTagsNotIn(List<String> values) {
+            addCriterion("`tags` not in", values, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidBetween(String value1, String value2) {
-            addCriterion("`tagId` between", value1, value2, "tagid");
+        public Criteria andTagsBetween(String value1, String value2) {
+            addCriterion("`tags` between", value1, value2, "tags");
             return (Criteria) this;
         }
 
-        public Criteria andTagidNotBetween(String value1, String value2) {
-            addCriterion("`tagId` not between", value1, value2, "tagid");
+        public Criteria andTagsNotBetween(String value1, String value2) {
+            addCriterion("`tags` not between", value1, value2, "tags");
             return (Criteria) this;
         }
 
