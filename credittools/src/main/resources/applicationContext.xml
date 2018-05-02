@@ -40,6 +40,13 @@
         <property name="jdbcInterceptors" value="ConnectionState;StatementFinalizer"/>
     </bean>
 
+    <bean id="fileUpload" class="cn.caijiajia.cloud.service.impl.FileUploadToQiniu">
+        <property name="accessKey" value="${qiniu.accessKey}"/>
+        <property name="secretKey" value="${qiniu.secretKey}"/>
+        <property name="bucketName" value="${qiniu.bucket.img}"/>
+        <property name="imgUrl" value="${qiniu.url.img}"/>
+    </bean>
+
     <bean id="taskExecutor"
           class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"
           lazy-init="true">

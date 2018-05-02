@@ -28,4 +28,7 @@ public class ErrorResponseConstants {
     public static final Integer CHANGE_PRODUCT_STATUS_FAILED_CODE = 0003;
     public static final String CHANGE_PRODUCT_STATUS_FAILED_MSG = "更改产品上下线状态失败";
 
+    public static final int ERR_RESX_UPLOAD_FAILURE_CODE = 9458;
+    public static final String ERR_RESX_UPLOAD_FAILURE_MSG = "资源上传失败！";
+
 }

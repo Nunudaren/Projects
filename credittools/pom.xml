@@ -237,6 +237,10 @@
         </dependency>
         <dependency>
             <groupId>cn.caijiajia</groupId>
+            <artifactId>cloud-file-store</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.caijiajia</groupId>
             <artifactId>payment-rpc</artifactId>
         </dependency>
         <dependency>

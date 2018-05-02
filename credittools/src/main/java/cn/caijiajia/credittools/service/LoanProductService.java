@@ -1,5 +1,6 @@
 package cn.caijiajia.credittools.service;
 
+import cn.caijiajia.cloud.service.FileUploadService;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.domain.Product;
@@ -10,13 +11,15 @@ import cn.caijiajia.credittools.form.ProductForm;
 import cn.caijiajia.credittools.mapper.ProductMapper;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
 import cn.caijiajia.framework.exceptions.CjjClientException;
+import cn.caijiajia.framework.exceptions.CjjServerException;
+import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.fileupload.FileUploadException;
 import cn.caijiajia.credittools.form.RankForm;
 import cn.caijiajia.credittools.form.StatusForm;
 import cn.caijiajia.credittools.utils.DateUtil;
 import cn.caijiajia.credittools.vo.ProductVo;
-import cn.caijiajia.framework.exceptions.CjjServerException;
-import com.github.pagehelper.PageHelper;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Lists;
@@ -24,12 +27,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author:chendongdong
@@ -45,6 +51,10 @@ public class LoanProductService {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private FileUploadService fileUploadService;
+
+    @Autowired
     private DataSourceTransactionManager txManager;
 
     /**
@@ -226,6 +236,19 @@ public class LoanProductService {
         BeanUtils.copyProperties(product, productVo);
         productVo.setTags(tagList);
         return productVo;
+    }
+
+    public String uploadImg(MultipartFile file) throws Exception  {
+
+        String serial = UUID.randomUUID().toString();
+        String fileName = "LP_ICON_" + serial + ".png";
+        String imgUrl;
+        try {
+            imgUrl = fileUploadService.uploadFile(fileName, file.getBytes());
+        } catch (FileUploadException e) {
+            throw new CjjServerException(ErrorResponseConstants.ERR_RESX_UPLOAD_FAILURE_CODE, ErrorResponseConstants.ERR_RESX_UPLOAD_FAILURE_MSG, e);
+        }
+        return imgUrl;
     }
 
 }
