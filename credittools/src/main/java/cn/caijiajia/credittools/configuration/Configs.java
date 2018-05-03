@@ -23,4 +23,7 @@ import java.util.Map;
 public class Configs {
     @ConfElement(name = "credittools_tags")
     private Map<String, String> tags;
+
+    @ConfElement(name = "loanproduct_loanproducts_guide_words")
+    private String guideWords;
 }
