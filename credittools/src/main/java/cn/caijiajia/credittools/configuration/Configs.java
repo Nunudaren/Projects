@@ -29,6 +29,6 @@ public class Configs {
     @ConfElement(name = "credittools_product_tags")
     private List<String> loanProductTags;
 
-    @ConfElement(name = "credittools_tags")
-    private Map<String, String> tags;
+    @ConfElement(name = "loanproduct_loanproducts_guide_words")
+    private String guideWords;
 }

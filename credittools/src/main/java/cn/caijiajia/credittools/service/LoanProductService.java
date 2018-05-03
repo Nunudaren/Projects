@@ -4,26 +4,28 @@ import cn.caijiajia.cloud.service.FileUploadService;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.configuration.Configs;
+import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
+import cn.caijiajia.credittools.constant.ProductSortEnum;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductExample;
-import cn.caijiajia.credittools.form.LoanProductListForm;
-import cn.caijiajia.credittools.form.ProductForm;
-import cn.caijiajia.credittools.form.RankForm;
-import cn.caijiajia.credittools.form.StatusForm;
+import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.mapper.ProductMapper;
 import cn.caijiajia.credittools.utils.DateUtil;
-import cn.caijiajia.credittools.vo.LoanProductListVo;
-import cn.caijiajia.credittools.vo.ProductVo;
-import cn.caijiajia.credittools.vo.TagVo;
+import cn.caijiajia.credittools.utils.MoneyUtil;
+import cn.caijiajia.credittools.vo.*;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.exceptions.CjjServerException;
+import cn.caijiajia.framework.threadlocal.ParameterThreadLocal;
+import cn.caijiajia.loanproduct.common.Resp.LoanProductResp;
 import com.github.pagehelper.PageHelper;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.util.Lists;
-import org.assertj.core.util.Sets;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -236,7 +238,7 @@ public class LoanProductService {
     public String uploadImg(MultipartFile file) throws Exception  {
 
         String serial = UUID.randomUUID().toString();
-        String fileName = "LP_ICON_" + serial + ".png";
+        String fileName = "LP_ICON_" + serial + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
         String imgUrl;
         try {
             imgUrl = fileUploadService.uploadFile(fileName, file.getBytes());
@@ -246,32 +248,18 @@ public class LoanProductService {
         return imgUrl;
     }
 
-    public Set<TagVo> getUsedTags() {
-        Set<TagVo> set = Sets.newHashSet();
-//        String tagsstr = "{\n" +
-//                "  \"1\": \"用芝麻分贷款\",\n" +
-//                "  \"2\": \"大额贷款\",\n" +
-//                "  \"3\": \"低门槛\",\n" +
-//                "  \"4\": \"不查征信\",\n" +
-//                "  \"5\": \"凭身份证可贷\",\n" +
-//                "  \"6\": \"代还信用卡\",\n" +
-//                "  \"7\": \"小额极速贷\",\n" +
-//                "  \"8\": \"新用户有优惠\"\n" +
-//                "}";
-//        Map<String, String> tags = JSON.parseObject(tagsstr, Map.class);
-        Map<String, String> tags = configs.getTags();
+    public Set<String> getUsedTags() {
+        Set<String> set = Sets.newHashSet();
+        List<String> tags = configs.getLoanProductTags();
         ProductExample productExample = new ProductExample();
-        productExample.createCriteria().andStatusEqualTo(true);
+        productExample.createCriteria().andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
         List<Product> products = productMapper.selectByExample(productExample);
         if (CollectionUtils.isNotEmpty(products)) {
             for (Product product : products) {
-                List<String> tagids = Lists.newArrayList(product.getTags().split(","));
+                List<String> tagids = Lists.newArrayList(product.getTags().split(CredittoolsConstants.SPLIT_MARK));
                 for (String tagid : tagids) {
-                    if (tags.containsKey(tagid)) {
-                        set.add(TagVo.builder()
-                                .tagId(Integer.valueOf(tagid))
-                                .tagName(tags.get(tagid))
-                                .build());
+                    if (tags.contains(tagid)) {
+                        set.add(tagid);
                     }
                     if (set.size() == tags.size()) {
                         return set;
@@ -281,6 +269,108 @@ public class LoanProductService {
         }
 
         return set;
+    }
+
+    public ProductListClientVo getProductListClient(ProductListClientForm productListClientForm) {
+        String guideWords = null;
+        List<Product> products = getProducts(productListClientForm);
+        if (null != configs.getGuideWords()) {
+            guideWords = configs.getGuideWords();
+        }
+        List<ProductClientVo> rtnVo = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(products)) {
+            rtnVo = transform(products);
+        }
+        return ProductListClientVo.builder()
+                .loanProductList(rtnVo)
+                .guideWords(guideWords)
+                .build();
+    }
+
+    private List<Product> getProducts(ProductListClientForm productListClientForm) {
+        ProductExample productExample = new ProductExample();
+        ProductExample.Criteria criteria = productExample.createCriteria();
+        criteria.andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
+        if (StringUtils.isEmpty(productListClientForm.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientForm.getSortValue())) {
+            productExample.setOrderByClause("rank asc");
+        } else if(ProductSortEnum.LEND_FAST.getValue().equals(productListClientForm.getSortValue())){
+            productExample.setOrderByClause("lend_time asc");
+        } else if(ProductSortEnum.FEE_RATE_LOW.getValue().equals(productListClientForm.getSortValue())){
+            productExample.setOrderByClause("annual_rate asc");
+        } else if(ProductSortEnum.PASS_RATE_HIGH.getValue().equals(productListClientForm.getSortValue())){
+            productExample.setOrderByClause("pass_rate desc");
+        }
+        if (null == productListClientForm.getFilterType() || StringUtils.isEmpty(productListClientForm.getFilterValue())) {
+            return productMapper.selectByExample(productExample);
+        }
+        if (ProductFilterTypeEnum.LEND_AMOUNT == productListClientForm.getFilterType()) {
+            String[] filterAmount = StringUtils.split(productListClientForm.getFilterValue(), ",");
+            Integer filterMinAmount = Integer.parseInt(filterAmount[0]);
+            Integer filterMaxAmount = Integer.parseInt(filterAmount[1]);
+
+            criteria.andMinAmountLessThanOrEqualTo(filterMaxAmount).andMaxAmountGreaterThanOrEqualTo(filterMinAmount);
+            return productMapper.selectByExample(productExample);
+
+        } else if (ProductFilterTypeEnum.PRODUCT_TAGS == productListClientForm.getFilterType()) {
+
+            criteria.andTagsLike(productListClientForm.getFilterValue());
+            return productMapper.selectByExample(productExample);
+        }
+
+        return null;
+    }
+
+    private List<ProductClientVo> transform(List<Product> loanProducts) {
+        return Lists.newArrayList(Collections2.transform(loanProducts, new Function<Product, ProductClientVo>() {
+            @Override
+            public ProductClientVo apply(Product input) {
+                return ProductClientVo.builder()
+                        .feeRate(input.getShowFeeRate() ? input.getFeeRate() : null)
+                        .iconUrl(input.getIconUrl())
+                        .id(input.getProductId())
+                        .jumpUrl(input.getJumpUrl() + "p_u=" + ParameterThreadLocal.getUid())
+                        .mark(input.getMark())
+                        .name(input.getName())
+                        .promotion(input.getPromotion())
+                        .optionalInfo(Lists.newArrayList(Collections2.transform(buildOptionalInfo(input), new Function<LoanProductResp.OptionalInfo, ProductClientVo.OptionalInfo>() {
+                            @Override
+                            public ProductClientVo.OptionalInfo apply(LoanProductResp.OptionalInfo input) {
+                                return ProductClientVo.OptionalInfo.builder().type(input.getType()).value(input.getValue()).build();
+                            }
+                        })))
+                        .build();
+            }
+        }));
+    }
+
+    private List<LoanProductResp.OptionalInfo> buildOptionalInfo(Product product) {
+        List<LoanProductResp.OptionalInfo> optionalInfo = Lists.newArrayList();
+        Integer minAmount = product.getMinAmount();
+        Integer maxAmount = product.getMaxAmount();
+        optionalInfo.add(LoanProductResp.OptionalInfo.builder()
+                .type("额度范围")
+                //最低额度与最高额度相等时只显示一个额度值
+                .value(minAmount.intValue() == maxAmount.intValue() ?
+                        MoneyUtil.decimalFormat(maxAmount) + "元" :
+                        MoneyUtil.decimalFormat(minAmount) + "-" + MoneyUtil.decimalFormat(maxAmount) + "元")
+                .build());
+        if (product.getShowFeeRate()) {
+            optionalInfo.add(LoanProductResp.OptionalInfo.builder()
+                    .type("参考利率")
+                    .value(product.getFeeRate())
+                    .build());
+        } else {
+            optionalInfo.add(LoanProductResp.OptionalInfo.builder()
+                    .type("借款周期")
+                    .value(product.getLendPeriod())
+                    .build());
+        }
+        if (!product.getAomountFirst()) {
+            LoanProductResp.OptionalInfo temp = optionalInfo.get(0);
+            optionalInfo.set(0, optionalInfo.get(1));
+            optionalInfo.set(1, temp);
+        }
+        return optionalInfo;
     }
 
     /**

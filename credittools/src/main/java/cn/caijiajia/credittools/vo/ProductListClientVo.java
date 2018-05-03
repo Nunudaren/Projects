@@ -14,15 +14,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- * Created by liujianyang on 2018/5/2.
+ * Created by liujianyang on 2018/5/3.
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagVo {
-
-    private Integer tagId;
-    private String tagName;
+public class ProductListClientVo {
+    private String guideWords;
+    private List<ProductClientVo> loanProductList;
 }
