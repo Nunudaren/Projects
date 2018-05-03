@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liujianyang on 2018/4/28.
@@ -37,18 +38,11 @@ public class ProductVo {
     private Boolean showFeeRate;
     private String promotion;
     private String jumpUrl;
-    private List<Tag> tags;
+    private List<String> tags;
     private Double annualRate;
     private Double lendTime;
     private Double passRate;
     private Boolean amountFirst;
+    private List<String> configTags;
 
-        @Data
-        @Builder
-        @AllArgsConstructor
-        @NoArgsConstructor
-        public static class Tag{
-            private String tagId;
-            private String tagName;
-        }
 }

@@ -5,6 +5,7 @@ import cn.caijiajia.credittools.form.LoanProductListForm;
 import cn.caijiajia.credittools.form.ProductForm;
 import cn.caijiajia.credittools.form.ProductListClientForm;
 import cn.caijiajia.credittools.form.RankForm;
+import cn.caijiajia.credittools.form.StatusForm;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
 import cn.caijiajia.credittools.vo.ProductListClientVo;
@@ -27,15 +28,15 @@ public class LoanProductController {
     @Autowired
     private LoanProductService loanProductService;
 
-    @RequestMapping(value = "/product", method = RequestMethod.POST)
+    @RequestMapping(value = "/editProduct", method = RequestMethod.POST)
     public void addOrUpdateProduct(@RequestBody ProductForm productForm) {
         productForm.checkField();
         loanProductService.addOrUpdateProduct(productForm);
     }
 
-    @RequestMapping(value = "/product/{id}", method = RequestMethod.GET)
-    public ProductVo getProduct(@PathVariable Integer id) {
-        return loanProductService.getProductVoById(id);
+    @RequestMapping(value = "/productDetail/{productId}", method = RequestMethod.GET)
+    public ProductVo getProduct(@PathVariable String productId) {
+        return loanProductService.getProductVoById(productId);
     }
 
     @RequestMapping(value = "/uploadImg", method = RequestMethod.POST)
@@ -54,18 +55,13 @@ public class LoanProductController {
         return loanProductService.getProductList(loanProductListForm);
     }
 
-    @RequestMapping(value = "/getProductRank", method = RequestMethod.GET)
-    public Product getProductRankById(String productId) {
-        return loanProductService.getProductRankById(productId);
-    }
-
     /**
      * 修改产品的展示位置
      *
      * @param rankForm
      */
     @RequestMapping(value = "/changeProductRank", method = RequestMethod.POST)
-    public void ChangeRankByProductId(@RequestBody RankForm rankForm) {
+    public void changeRankByProductId(@RequestBody RankForm rankForm) {
         loanProductService.upateRankByProductId(rankForm);
     }
 
@@ -83,5 +79,15 @@ public class LoanProductController {
     @RequestMapping(value = "/getLoanProductList", method = RequestMethod.GET)
     public ProductListClientVo getLoanProductListClient(ProductListClientForm productListClientForm) {
         return loanProductService.getProductListClient(productListClientForm);
+    }
+
+    /**
+     * 更改产品上/下线状态
+     *
+     * @param statusForm
+     */
+    @RequestMapping(value = "/changeProductStatus", method = RequestMethod.POST)
+    public void changeProductStatus(StatusForm statusForm) {
+        loanProductService.updateLineStatus(statusForm);
     }
 }

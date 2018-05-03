@@ -8,9 +8,9 @@ import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.constant.ProductSortEnum;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductExample;
-import cn.caijiajia.credittools.domain.Tag;
 import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.mapper.ProductMapper;
+import cn.caijiajia.credittools.utils.DateUtil;
 import cn.caijiajia.credittools.utils.MoneyUtil;
 import cn.caijiajia.credittools.vo.*;
 import cn.caijiajia.framework.exceptions.CjjClientException;
@@ -23,18 +23,17 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.fileupload.FileUploadException;
-import cn.caijiajia.credittools.utils.DateUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -51,9 +50,6 @@ public class LoanProductService {
 
     @Autowired
     private ProductMapper productMapper;
-
-    @Autowired
-    private TagService tagService;
 
     @Autowired
     private FileUploadService fileUploadService;
@@ -137,7 +133,7 @@ public class LoanProductService {
                 update.setRank(rank);
                 productMapper.updateByPrimaryKeySelective(update);
             }
-            Product toUpdate = getProductRankById(rankForm.getProductId());
+            Product toUpdate = getProductById(rankForm.getProductId());
             toUpdate.setRank(rankForm.getChangedRank());
             productMapper.updateByPrimaryKeySelective(toUpdate);
             txManager.commit(transactionStatus);
@@ -177,7 +173,7 @@ public class LoanProductService {
     }
 
 
-    public Product getProductRankById(String productId) {
+    public Product getProductById(String productId) {
         ProductExample example = new ProductExample();
         example.or().andProductIdEqualTo(productId);
         List<Product> products = productMapper.selectByExample(example);
@@ -192,15 +188,18 @@ public class LoanProductService {
     public void addOrUpdateProduct(ProductForm productForm) {
         if (productForm.getId() == null) {
             Product product = new Product();
+            product.setTags(StringUtils.join(productForm.getTags().toArray(), CredittoolsConstants.SPLIT_MARK));
             BeanUtils.copyProperties(productForm, product);
             product.setStatus(false);
             product.setAomountFirst(productForm.getAmountFirst());
             product.setOfflinetime(new Date());
             product.setRank(getMaxRank() + 1);
+            //TODO 产品编号
             productMapper.insertSelective(product);
         } else {
             Product product = getProductById(productForm.getId());
             BeanUtils.copyProperties(productForm, product);
+            product.setTags(StringUtils.join(productForm.getTags().toArray(), CredittoolsConstants.SPLIT_MARK));
             productMapper.updateByPrimaryKey(product);
         }
     }
@@ -219,30 +218,24 @@ public class LoanProductService {
         return productMapper.selectByPrimaryKey(id);
     }
 
-    public ProductVo getProductVoById(Integer id) {
+    public ProductVo getProductVoById(String productId) {
         ProductVo productVo = ProductVo.builder().build();
-        Product product = getProductById(id);
+        Product product = getProductById(productId);
         if (product == null) {
             throw new CjjClientException(ErrorResponseConstants.PRODUCT_NOT_FOUND_CODE, ErrorResponseConstants.PRODUCT_NOT_FOUND_MSG);
         }
-        String tagId = product.getTags();
-        List<String> tags = Lists.newArrayList(tagId.split(CredittoolsConstants.SPLIT_MARK));
-        List<ProductVo.Tag> tagList = Lists.newArrayList();
-        for (String tag : tags) {
-            Tag tagById = tagService.getTagById(Integer.valueOf(tag));
-            if (tagById != null) {
-                tagList.add(ProductVo.Tag.builder()
-                        .tagId(tagById.getTagId())
-                        .tagName(tagById.getTagName())
-                        .build());
-            }
-        }
         BeanUtils.copyProperties(product, productVo);
-        productVo.setTags(tagList);
+        setTagList(productVo,product);
+        productVo.setConfigTags(getLoanProductTags());
         return productVo;
     }
 
-    public String uploadImg(MultipartFile file) throws Exception {
+    private void setTagList(ProductVo productVo, Product product) {
+        List<String> tag = Arrays.asList(product.getTags().split(CredittoolsConstants.SPLIT_MARK));
+        productVo.setTags(tag);
+    }
+
+    public String uploadImg(MultipartFile file) throws Exception  {
 
         String serial = UUID.randomUUID().toString();
         String fileName = "LP_ICON_" + serial + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
@@ -392,6 +385,18 @@ public class LoanProductService {
             optionalInfo.set(1, temp);
         }
         return optionalInfo;
+    }
+
+    /**
+     * 获取配置项标签
+     * @return
+     */
+    public List<String> getLoanProductTags(){
+        List<String> tags = Lists.newArrayList();
+        if(null != configs.getLoanProductTags()){
+            tags = configs.getLoanProductTags();
+        }
+        return tags;
     }
 
 }

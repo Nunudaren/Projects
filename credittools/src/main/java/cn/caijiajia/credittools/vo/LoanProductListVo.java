@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoanProductListVo {
-    private int rank;  //展示位置（对应客户端展示排序）
+    private Integer rank;  //展示位置（对应客户端展示排序）
     private String productId;
     private String productName;
     private String iconUrl;

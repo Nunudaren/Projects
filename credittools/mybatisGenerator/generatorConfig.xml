@@ -128,7 +128,7 @@
         <!--<table tableName="operation_log" delimitIdentifiers="true" delimitAllColumns="true"/>-->
         <!--<table tableName="user_apply_timeline" delimitIdentifiers="true" delimitAllColumns="true"/>-->
         <table tableName="product" delimitIdentifiers="true" delimitAllColumns="true"></table>
-        <table tableName="tag" delimitIdentifiers="true" delimitAllColumns="true"></table>
+        <!--<table tableName="tag" delimitIdentifiers="true" delimitAllColumns="true"></table>-->
 
         <!--<table tableName="user_info" delimitIdentifiers="true" delimitAllColumns="true"/>-->
 
