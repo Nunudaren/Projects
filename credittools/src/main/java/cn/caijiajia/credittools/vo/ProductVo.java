@@ -38,7 +38,6 @@ public class ProductVo {
     private Boolean showFeeRate;
     private String promotion;
     private String jumpUrl;
-//    private List<Tag> tags;
     private List<String> tags;
     private Double annualRate;
     private Double lendTime;
@@ -46,12 +45,4 @@ public class ProductVo {
     private Boolean amountFirst;
     private List<String> configTags;
 
-//        @Data
-//        @Builder
-//        @AllArgsConstructor
-//        @NoArgsConstructor
-//        public static class Tag{
-//            private String tagId;
-//            private String tagName;
-//        }
 }

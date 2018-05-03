@@ -53,11 +53,6 @@ public class LoanProductController {
         return loanProductService.getProductList(loanProductListForm);
     }
 
-    @RequestMapping(value = "/getProductRank", method = RequestMethod.GET)
-    public Product getProductById(String productId) {
-        return loanProductService.getProductById(productId);
-    }
-
     /**
      * 修改产品的展示位置
      *
@@ -69,7 +64,6 @@ public class LoanProductController {
     }
 
     /**
-     *
      * 获取使用到的标签
      */
     @RequestMapping(value = "/usedTag", method = RequestMethod.GET)
@@ -77,9 +71,9 @@ public class LoanProductController {
         return loanProductService.getUsedTags();
     }
 
-
     /**
      * 更改产品上/下线状态
+     *
      * @param statusForm
      */
     @RequestMapping(value = "/changeProductStatus", method = RequestMethod.POST)

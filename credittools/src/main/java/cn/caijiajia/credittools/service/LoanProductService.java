@@ -50,9 +50,6 @@ public class LoanProductService {
     private ProductMapper productMapper;
 
     @Autowired
-    private TagService tagService;
-
-    @Autowired
     private FileUploadService fileUploadService;
 
     @Autowired
@@ -195,6 +192,7 @@ public class LoanProductService {
             product.setAomountFirst(productForm.getAmountFirst());
             product.setOfflinetime(new Date());
             product.setRank(getMaxRank() + 1);
+            //TODO 产品编号
             productMapper.insertSelective(product);
         } else {
             Product product = getProductById(productForm.getId());
@@ -227,21 +225,6 @@ public class LoanProductService {
         BeanUtils.copyProperties(product, productVo);
         setTagList(productVo,product);
         productVo.setConfigTags(getLoanProductTags());
-//        String tagId = product.getTagid();
-//        List<String> tags = Lists.newArrayList(tagId.split(CredittoolsConstants.SPLIT_MARK));
-//        List<ProductVo.Tag> tagList = Lists.newArrayList();
-//        for (String tag : tags) {
-//            Tag tagById = tagService.getTagById(Integer.valueOf(tag));
-//            if (tagById != null) {
-//                tagList.add(ProductVo.Tag.builder()
-//                        .tagId(tagById.getTagId())
-//                        .tagName(tagById.getTagName())
-//                        .build());
-//            }
-//        }
-//        BeanUtils.copyProperties(product, productVo);
-//        productVo.setTags(tagList);
-
         return productVo;
     }
 
