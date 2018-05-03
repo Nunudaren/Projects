@@ -6,7 +6,6 @@ import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductExample;
-import cn.caijiajia.credittools.domain.Tag;
 import cn.caijiajia.credittools.form.LoanProductListForm;
 import cn.caijiajia.credittools.form.ProductForm;
 import cn.caijiajia.credittools.form.RankForm;
