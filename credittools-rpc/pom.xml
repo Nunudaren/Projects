@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.caijiajia</groupId>
-            <artifactId>apiapply-common</artifactId>
+            <artifactId>credittools-common</artifactId>
             <version>${project.release.version}</version>
         </dependency>
         <dependency>
