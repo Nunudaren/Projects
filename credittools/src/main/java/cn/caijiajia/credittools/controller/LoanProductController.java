@@ -3,10 +3,12 @@ package cn.caijiajia.credittools.controller;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.form.LoanProductListForm;
 import cn.caijiajia.credittools.form.ProductForm;
+import cn.caijiajia.credittools.form.ProductListClientForm;
 import cn.caijiajia.credittools.form.RankForm;
 import cn.caijiajia.credittools.form.StatusForm;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
+import cn.caijiajia.credittools.vo.ProductListClientVo;
 import cn.caijiajia.credittools.vo.ProductVo;
 import cn.caijiajia.credittools.vo.TagVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,14 @@ public class LoanProductController {
     @RequestMapping(value = "/usedTag", method = RequestMethod.GET)
     public Set<TagVo> getUsedTags() {
         return loanProductService.getUsedTags();
+    }
+
+    /**
+     * 贷款产品聚合页，获取贷款产品列表
+     */
+    @RequestMapping(value = "/getLoanProductList", method = RequestMethod.GET)
+    public ProductListClientVo getLoanProductListClient(ProductListClientForm productListClientForm) {
+        return loanProductService.getProductListClient(productListClientForm);
     }
 
     /**
