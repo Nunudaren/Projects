@@ -248,32 +248,18 @@ public class LoanProductService {
         return imgUrl;
     }
 
-    public Set<TagVo> getUsedTags() {
-        Set<TagVo> set = Sets.newHashSet();
-//        String tagsstr = "{\n" +
-//                "  \"1\": \"用芝麻分贷款\",\n" +
-//                "  \"2\": \"大额贷款\",\n" +
-//                "  \"3\": \"低门槛\",\n" +
-//                "  \"4\": \"不查征信\",\n" +
-//                "  \"5\": \"凭身份证可贷\",\n" +
-//                "  \"6\": \"代还信用卡\",\n" +
-//                "  \"7\": \"小额极速贷\",\n" +
-//                "  \"8\": \"新用户有优惠\"\n" +
-//                "}";
-//        Map<String, String> tags = JSON.parseObject(tagsstr, Map.class);
-        Map<String, String> tags = configs.getTags();
+    public Set<String> getUsedTags() {
+        Set<String> set = Sets.newHashSet();
+        List<String> tags = configs.getLoanProductTags();
         ProductExample productExample = new ProductExample();
-        productExample.createCriteria().andStatusEqualTo(true);
+        productExample.createCriteria().andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
         List<Product> products = productMapper.selectByExample(productExample);
         if (CollectionUtils.isNotEmpty(products)) {
             for (Product product : products) {
                 List<String> tagids = Lists.newArrayList(product.getTags().split(CredittoolsConstants.SPLIT_MARK));
                 for (String tagid : tagids) {
-                    if (tags.containsKey(tagid)) {
-                        set.add(TagVo.builder()
-                                .tagId(Integer.valueOf(tagid))
-                                .tagName(tags.get(tagid))
-                                .build());
+                    if (tags.contains(tagid)) {
+                        set.add(tagid);
                     }
                     if (set.size() == tags.size()) {
                         return set;
