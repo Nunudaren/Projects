@@ -281,6 +281,9 @@ public class LoanProductService {
                                 .tagName(tags.get(tagid))
                                 .build());
                     }
+                    if(set.size() == tags.size()){
+                        return set;
+                    }
                 }
             }
         }
