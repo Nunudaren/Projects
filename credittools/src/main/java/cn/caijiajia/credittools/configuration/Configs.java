@@ -11,16 +11,24 @@ package cn.caijiajia.credittools.configuration;
 
 import cn.caijiajia.confplus.client.annotation.AppConf;
 import cn.caijiajia.confplus.client.annotation.ConfElement;
+import org.springframework.stereotype.Component;
 import lombok.Data;
 
 import java.util.Map;
+import java.util.List;
 
 /**
- * Created by liujianyang on 2018/5/2.
+ * @Author:chendongdong
+ * @Date:2018/5/2
  */
 @AppConf
+@Component
 @Data
 public class Configs {
+
+    @ConfElement(name = "credittools_product_tags")
+    private List<String> loanProductTags;
+
     @ConfElement(name = "credittools_tags")
     private Map<String, String> tags;
 }

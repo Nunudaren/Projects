@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Created by liujianyang on 2018/4/27.
@@ -46,8 +47,7 @@ public class ProductForm {
     private String promotion;
     @NotBlank
     private String jumpUrl;
-    @NotBlank
-    private String tags;
+    private List<String> tags;
     @NotNull
     private Double annualRate;
     @NotNull

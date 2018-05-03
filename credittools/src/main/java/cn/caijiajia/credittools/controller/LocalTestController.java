@@ -11,13 +11,16 @@ package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.form.RankForm;
 import cn.caijiajia.credittools.service.LoanProductService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liujianyang on 2018/4/25.
@@ -47,6 +50,27 @@ public class LocalTestController {
     public static void main(String[] args) {
         Date date1 = new Date(Long.valueOf("1524828100946"));
         System.out.println(date1);
-        System.out.println(new Date().getTime());
+        System.out.println(String.valueOf(new Date().getTime() /1000));
+        List<String> list = new ArrayList<>();
+        list.add("nihjao");
+        list.add("好我");
+        list.add("cde");
+        String[] strArray = list.toString().split(",");
+        String listToStr = StringUtils.join(list.toArray(), ",");
+        Object[] objList =  list.toArray();
+        System.out.println(strArray);
+        System.out.println(listToStr);
+        List<String> newList = new ArrayList<>();
+        for(String listStr : strArray){
+            newList.add(listStr);
+        }
+        System.out.println(newList.toString());
+        String str = "";
+        for(Object stri : objList){
+            str = str + stri;
+        }
+        System.out.println(str);
+
+//        Double b = new Double();
     }
 }
