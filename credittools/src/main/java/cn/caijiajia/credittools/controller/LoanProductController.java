@@ -81,7 +81,7 @@ public class LoanProductController {
      * @param statusForm
      */
     @RequestMapping(value = "/changeProductStatus", method = RequestMethod.POST)
-    public void changeProductStatus(StatusForm statusForm) {
+    public void changeProductStatus(@RequestBody StatusForm statusForm) {
         loanProductService.updateLineStatus(statusForm);
     }
 }

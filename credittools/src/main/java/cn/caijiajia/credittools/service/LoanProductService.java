@@ -164,8 +164,16 @@ public class LoanProductService {
                 return;
             }
             Product update = new Product();
+            BeanUtils.copyProperties(productList.get(0), update);
             update.setStatus(statusForm.getStatus().equals("1") ? true : false);
-            productMapper.updateByPrimaryKeySelective(update);
+            if (update.getStatus()) {
+                update.setOfflinetime(null);
+                update.setOnlinetime(new Date());
+            } else {
+                update.setOnlinetime(null);
+                update.setOfflinetime(new Date());
+            }
+            productMapper.updateByPrimaryKey(update);
         } else {
             log.error("更新产品位置序号失败！");
             throw new CjjServerException(ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_CODE, ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_MSG);
@@ -195,6 +203,7 @@ public class LoanProductService {
             product.setOfflinetime(new Date());
             product.setRank(getMaxRank() + 1);
             //TODO 产品编号
+            product.setProductId(createProductId());
             productMapper.insertSelective(product);
         } else {
             Product product = getProductById(productForm.getId());
@@ -214,6 +223,26 @@ public class LoanProductService {
         return products.get(0).getRank();
     }
 
+    private String getMaxProductId() {
+        ProductExample example = new ProductExample();
+        example.setOrderByClause("rank desc");
+        List<Product> productList = productMapper.selectByExample(example);
+        if (CollectionUtils.isEmpty(productList)) {
+            return CredittoolsConstants.PRODUCT_ID_INITIAL_VALUE;
+        }
+        return productList.get(0).getProductId();
+    }
+
+    private String createProductId() {
+        String maxProductId = getMaxProductId();
+        if (maxProductId.length() > CredittoolsConstants.PRODUCT_ID_INITIAL_VALUE.length()) {
+            return String.valueOf(Integer.valueOf(maxProductId) + 1);
+        }
+        Integer rank = Integer.parseInt(maxProductId.replaceAll("^(0+)", "")) + 1;
+        String productId = maxProductId.substring(0, maxProductId.length() - String.valueOf(rank).length()) + String.valueOf(rank);
+        return productId;
+    }
+
     private Product getProductById(Integer id) {
         return productMapper.selectByPrimaryKey(id);
     }
@@ -225,7 +254,7 @@ public class LoanProductService {
             throw new CjjClientException(ErrorResponseConstants.PRODUCT_NOT_FOUND_CODE, ErrorResponseConstants.PRODUCT_NOT_FOUND_MSG);
         }
         BeanUtils.copyProperties(product, productVo);
-        setTagList(productVo,product);
+        setTagList(productVo, product);
         productVo.setConfigTags(getLoanProductTags());
         return productVo;
     }
@@ -235,7 +264,7 @@ public class LoanProductService {
         productVo.setTags(tag);
     }
 
-    public String uploadImg(MultipartFile file) throws Exception  {
+    public String uploadImg(MultipartFile file) throws Exception {
 
         String serial = UUID.randomUUID().toString();
         String fileName = "LP_ICON_" + serial + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
@@ -375,11 +404,12 @@ public class LoanProductService {
 
     /**
      * 获取配置项标签
+     *
      * @return
      */
-    public List<String> getLoanProductTags(){
+    public List<String> getLoanProductTags() {
         List<String> tags = Lists.newArrayList();
-        if(null != configs.getLoanProductTags()){
+        if (null != configs.getLoanProductTags()) {
             tags = configs.getLoanProductTags();
         }
         return tags;
