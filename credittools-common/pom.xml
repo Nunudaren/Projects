@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cn.caijiajia</groupId>
+        <artifactId>credittools-parent</artifactId>
+        <version>1.0.0.RELEASE</version>
+    </parent>
+
+    <name>CaiJiaJia credittools-common</name>
+    <artifactId>credittools-common</artifactId>
+    <packaging>jar</packaging>
+    <version>${project.release.version}</version>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.10</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.caijiajia</groupId>
+            <artifactId>framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.caijiajia</groupId>
+            <artifactId>loan-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.caijiajia</groupId>
+            <artifactId>autoaudit-common</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>
