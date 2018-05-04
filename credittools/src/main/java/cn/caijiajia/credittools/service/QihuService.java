@@ -42,6 +42,9 @@ public class QihuService implements IProductsService {
     @Autowired
     private UserRpc userRpc;
 
+    @Autowired
+    private LoanProductService loanProductService;
+
     private static final String METHOD = "user.unionlogin";
 
     @Override
@@ -51,11 +54,11 @@ public class QihuService implements IProductsService {
         QihuResp qihuResp = qihuDelegate.invoke(unionLoginReq, METHOD);
         if (qihuResp.getCode() == 200) {
             if (qihuResp.getData() == null || StringUtils.isEmpty(qihuResp.getData().getLoginUrl())) {
-                return getUnionLoginUrl(key);
+                return loanProductService.getUnionLoginUrl(key);
             }
             return qihuResp.getData().getLoginUrl();
         } else {
-            return getUnionLoginUrl(key);
+            return loanProductService.getUnionLoginUrl(key);
         }
     }
 
@@ -66,15 +69,6 @@ public class QihuService implements IProductsService {
             throw new CjjClientException(ErrorResponseConstants.USER_NOT_EXISTS_CODE, ErrorResponseConstants.USER_NOT_EXISTS_MESSAGE);
         }
         return userInfo.getMobile();
-    }
-
-    private String getUnionLoginUrl(String key){
-        final Map<String, String> unionLoginUrl = configs.getUnionLoginUrl();
-        if(MapUtils.isNotEmpty(unionLoginUrl)){
-            return unionLoginUrl.get(key);
-        }
-        log.error("未配置联合登录Url, loanmarket_union_login_url");
-        throw new CjjClientException(ErrorResponseConstants.GET_UNION_URL_ERR_CODE, ErrorResponseConstants.GET_UNION_URL_ERR_MSG);
     }
 
     @Override
