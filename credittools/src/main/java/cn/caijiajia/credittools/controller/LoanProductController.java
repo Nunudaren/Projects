@@ -2,6 +2,8 @@ package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.service.LoanProductService;
+import cn.caijiajia.credittools.service.LoanProductsService;
+import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
 import cn.caijiajia.credittools.vo.LoanProductVo;
 import cn.caijiajia.credittools.vo.ProductListClientVo;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +26,9 @@ public class LoanProductController {
 
     @Autowired
     private LoanProductService loanProductService;
+
+    @Autowired
+    private LoanProductsService loanProductsService;
 
     @RequestMapping(value = "/editProduct", method = RequestMethod.POST)
     public void addOrUpdateProduct(@RequestBody ProductForm productForm) {
@@ -71,7 +78,7 @@ public class LoanProductController {
     /**
      * 贷款产品聚合页，获取贷款产品列表
      */
-    @RequestMapping(value = "/getLoanProductList", method = RequestMethod.GET)
+    @RequestMapping(value = "/v2/getLoanProductList", method = RequestMethod.GET)
     public ProductListClientVo getLoanProductListClient(ProductListClientForm productListClientForm) {
         return loanProductService.getProductListClient(productListClientForm);
     }
@@ -85,4 +92,26 @@ public class LoanProductController {
     public void changeProductStatus(@RequestBody StatusForm statusForm) {
         loanProductService.updateLineStatus(statusForm);
     }
+
+    /**
+     * 贷款产品聚合页，获取筛选选项接口
+     *
+     * @return
+     */
+    @RequestMapping(value = "/getLoanProductFilter", method = RequestMethod.GET)
+    public LoanProductFilterVo getLoanProductFilter() {
+        return loanProductsService.getLoanProductFilter();
+    }
+
+    /**
+     * 贷款产品联合登陆
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/union/login", method = RequestMethod.GET)
+    public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
+        loanProductService.unionLogin(request, response);
+    }
+
 }

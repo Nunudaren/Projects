@@ -17,6 +17,8 @@ import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.exceptions.CjjServerException;
 import cn.caijiajia.framework.threadlocal.ParameterThreadLocal;
 import cn.caijiajia.loanproduct.common.Resp.LoanProductResp;
+import cn.caijiajia.user.common.resp.UserVo;
+import cn.caijiajia.user.rpc.UserRpc;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Function;
@@ -36,6 +38,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -57,6 +62,15 @@ public class LoanProductService {
 
     @Autowired
     private DataSourceTransactionManager txManager;
+
+    @Autowired
+    private UserRpc userRpc;
+
+    @Autowired
+    private ProductsFactory productsFactory;
+
+    @Autowired
+    private UnionLoginLogService unionLoginLogService;
 
     /**
      * 按条件查询产品列表
@@ -361,7 +375,7 @@ public class LoanProductService {
                         .feeRate(input.getShowFeeRate() ? input.getFeeRate() : null)
                         .iconUrl(input.getIconUrl())
                         .id(input.getProductId())
-                        .jumpUrl(input.getJumpUrl() + "p_u=" + ParameterThreadLocal.getUid())
+                        .jumpUrl(input.getJumpUrl() + "&p_u=" + ParameterThreadLocal.getUid())
                         .mark(input.getMark())
                         .name(input.getName())
                         .promotion(input.getPromotion())
@@ -417,6 +431,32 @@ public class LoanProductService {
             tags = configs.getLoanProductTags();
         }
         return tags;
+    }
+
+    public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
+        String uid = request.getParameter("p_u");
+        String key = request.getParameter("key");
+        String mobile = getMobileNoCheck(uid);
+        IProductsService productsService = productsFactory.getProductService(key);
+        String jumpUrl = productsService.unionLogin(uid, key);
+
+        final String channelName = productsService.getChannelName();
+
+        unionLoginLogService.addUnionLoginLog(uid, channelName, mobile);
+
+        try {
+            response.sendRedirect(jumpUrl);
+        } catch (IOException e) {
+            throw new CjjClientException(ErrorResponseConstants.UNION_LOGIN_FAILED_CODE, ErrorResponseConstants.UNION_LOGIN_FAILED_MSG);
+        }
+    }
+
+    private String getMobileNoCheck(String uid) {
+        UserVo userInfo = userRpc.getUserInfo(uid);
+        if (userInfo == null) {
+            return null;
+        }
+        return userInfo.getMobile();
     }
 
 }

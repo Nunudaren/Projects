@@ -31,4 +31,13 @@ public class ErrorResponseConstants {
     public static final int ERR_RESX_UPLOAD_FAILURE_CODE = 9458;
     public static final String ERR_RESX_UPLOAD_FAILURE_MSG = "资源上传失败！";
 
+    public static final int USER_NOT_EXISTS_CODE = 8901;
+    public static final String USER_NOT_EXISTS_MESSAGE = "用户不存在";
+
+    public static final int GET_UNION_URL_ERR_CODE = 6002;
+    public static final String GET_UNION_URL_ERR_MSG = "未配置联合登录url";
+
+    public static final int UNION_LOGIN_FAILED_CODE = 6039;
+    public static final String UNION_LOGIN_FAILED_MSG = "联合登陆失败";
+
 }
