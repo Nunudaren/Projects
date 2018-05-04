@@ -17,7 +17,10 @@ import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.exceptions.CjjServerException;
 import cn.caijiajia.framework.threadlocal.ParameterThreadLocal;
 import cn.caijiajia.loanproduct.common.Resp.LoanProductResp;
+import cn.caijiajia.user.common.resp.UserVo;
+import cn.caijiajia.user.rpc.UserRpc;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -35,6 +38,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -57,17 +63,26 @@ public class LoanProductService {
     @Autowired
     private DataSourceTransactionManager txManager;
 
+    @Autowired
+    private UserRpc userRpc;
+
+    @Autowired
+    private ProductsFactory productsFactory;
+
+    @Autowired
+    private UnionLoginLogService unionLoginLogService;
+
     /**
      * 按条件查询产品列表
      *
      * @param loanProductListForm
      * @return
      */
-    public List<LoanProductListVo> getProductList(LoanProductListForm loanProductListForm) {
-        PageHelper.startPage(loanProductListForm.getPageNo(), loanProductListForm.getPageSize());
+    public LoanProductVo getProductList(LoanProductListForm loanProductListForm) {
         ProductExample example = new ProductExample();
         example.setOrderByClause("rank asc");
-        ProductExample.Criteria criteria = example.or();
+        ProductExample.Criteria criteria = example.createCriteria();
+        Integer total = productMapper.countByExample(example);
 
         if (StringUtils.isNotEmpty(loanProductListForm.getProductName())) {
             criteria.andNameIsNotNull().andNameLike("%" + loanProductListForm.getProductName() + "%");
@@ -75,16 +90,20 @@ public class LoanProductService {
         if (StringUtils.isNotEmpty(loanProductListForm.getProductId())) {
             criteria.andProductIdIsNotNull().andProductIdEqualTo(loanProductListForm.getProductId());
         }
-        if (StringUtils.isNotEmpty(loanProductListForm.getStatus())) {
-            criteria.andStatusIsNotNull().andStatusEqualTo(loanProductListForm.getStatus().equals("1") ? true : false);
+        if (!CredittoolsConstants.ALL_STATUS.equals(loanProductListForm.getStatus())) {
+            criteria.andStatusIsNotNull().andStatusEqualTo(loanProductListForm.getStatus().equals("1"));
         }
+        PageHelper.startPage(loanProductListForm.getPageNo(), loanProductListForm.getPageSize());
         List<Product> productList = productMapper.selectByExample(example);
-        List<LoanProductListVo> productVoList = transForm(productList);
+        PageInfo<LoanProductListVo> pageInfo = transForm(productList);
 
-        return productVoList;
+        return LoanProductVo.builder()
+                .totalCount(total)
+                .productVoList(pageInfo.getList())
+                .build();
     }
 
-    private List<LoanProductListVo> transForm(List<Product> productList) {
+    private PageInfo<LoanProductListVo> transForm(List<Product> productList) {
         List<LoanProductListVo> productVoList = Lists.newArrayList();
         for (Product product : productList) {
             LoanProductListVo loanProductListVo = LoanProductListVo.builder()
@@ -92,13 +111,13 @@ public class LoanProductService {
                     .productId(product.getProductId())
                     .productName(product.getName())
                     .iconUrl(product.getIconUrl())
-                    .onlineTime(DateUtil.convert2Str(product.getOnlinetime(), DateUtil.NYRSF))
-                    .offlineTime(DateUtil.convert2Str(product.getOfflinetime(), DateUtil.NYRSF))
+                    .onlineTime(product.getOnlinetime() == null ? ""  : DateUtil.convert2Str(product.getOnlinetime(), DateUtil.NYRSF))
+                    .offlineTime(product.getOfflinetime() == null ? "" : DateUtil.convert2Str(product.getOfflinetime(), DateUtil.NYRSF))
                     .status(product.getStatus() ? "1" : "0")//1：上线 0：下线
                     .build();
             productVoList.add(loanProductListVo);
         }
-        return productVoList;
+        return  new PageInfo<LoanProductListVo>(productVoList);
     }
 
     /**
@@ -164,8 +183,16 @@ public class LoanProductService {
                 return;
             }
             Product update = new Product();
+            BeanUtils.copyProperties(productList.get(0), update);
             update.setStatus(statusForm.getStatus().equals("1") ? true : false);
-            productMapper.updateByPrimaryKeySelective(update);
+            if (update.getStatus()) {
+                update.setOfflinetime(null);
+                update.setOnlinetime(new Date());
+            } else {
+                update.setOnlinetime(null);
+                update.setOfflinetime(new Date());
+            }
+            productMapper.updateByPrimaryKey(update);
         } else {
             log.error("更新产品位置序号失败！");
             throw new CjjServerException(ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_CODE, ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_MSG);
@@ -194,7 +221,7 @@ public class LoanProductService {
             product.setAomountFirst(productForm.getAmountFirst());
             product.setOfflinetime(new Date());
             product.setRank(getMaxRank() + 1);
-            //TODO 产品编号
+            product.setProductId(createProductId());
             productMapper.insertSelective(product);
         } else {
             Product product = getProductById(productForm.getId());
@@ -214,6 +241,26 @@ public class LoanProductService {
         return products.get(0).getRank();
     }
 
+    private String getMaxProductId() {
+        ProductExample example = new ProductExample();
+        example.setOrderByClause("rank desc");
+        List<Product> productList = productMapper.selectByExample(example);
+        if (CollectionUtils.isEmpty(productList)) {
+            return CredittoolsConstants.PRODUCT_ID_INITIAL_VALUE;
+        }
+        return productList.get(0).getProductId();
+    }
+
+    private String createProductId() {
+        String maxProductId = getMaxProductId();
+        if (maxProductId.length() > CredittoolsConstants.PRODUCT_ID_INITIAL_VALUE.length()) {
+            return String.valueOf(Integer.valueOf(maxProductId) + 1);
+        }
+        Integer rank = Integer.parseInt(maxProductId.replaceAll("^(0+)", "")) + 1;
+        String productId = maxProductId.substring(0, maxProductId.length() - String.valueOf(rank).length()) + String.valueOf(rank);
+        return productId;
+    }
+
     private Product getProductById(Integer id) {
         return productMapper.selectByPrimaryKey(id);
     }
@@ -225,7 +272,7 @@ public class LoanProductService {
             throw new CjjClientException(ErrorResponseConstants.PRODUCT_NOT_FOUND_CODE, ErrorResponseConstants.PRODUCT_NOT_FOUND_MSG);
         }
         BeanUtils.copyProperties(product, productVo);
-        setTagList(productVo,product);
+        setTagList(productVo, product);
         productVo.setConfigTags(getLoanProductTags());
         return productVo;
     }
@@ -235,7 +282,7 @@ public class LoanProductService {
         productVo.setTags(tag);
     }
 
-    public String uploadImg(MultipartFile file) throws Exception  {
+    public String uploadImg(MultipartFile file) throws Exception {
 
         String serial = UUID.randomUUID().toString();
         String fileName = "LP_ICON_" + serial + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
@@ -328,7 +375,7 @@ public class LoanProductService {
                         .feeRate(input.getShowFeeRate() ? input.getFeeRate() : null)
                         .iconUrl(input.getIconUrl())
                         .id(input.getProductId())
-                        .jumpUrl(input.getJumpUrl() + "p_u=" + ParameterThreadLocal.getUid())
+                        .jumpUrl(input.getJumpUrl() + "&p_u=" + ParameterThreadLocal.getUid())
                         .mark(input.getMark())
                         .name(input.getName())
                         .promotion(input.getPromotion())
@@ -375,14 +422,41 @@ public class LoanProductService {
 
     /**
      * 获取配置项标签
+     *
      * @return
      */
-    public List<String> getLoanProductTags(){
+    public List<String> getLoanProductTags() {
         List<String> tags = Lists.newArrayList();
-        if(null != configs.getLoanProductTags()){
+        if (null != configs.getLoanProductTags()) {
             tags = configs.getLoanProductTags();
         }
         return tags;
+    }
+
+    public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
+        String uid = request.getParameter("p_u");
+        String key = request.getParameter("key");
+        String mobile = getMobileNoCheck(uid);
+        IProductsService productsService = productsFactory.getProductService(key);
+        String jumpUrl = productsService.unionLogin(uid, key);
+
+        final String channelName = productsService.getChannelName();
+
+        unionLoginLogService.addUnionLoginLog(uid, channelName, mobile);
+
+        try {
+            response.sendRedirect(jumpUrl);
+        } catch (IOException e) {
+            throw new CjjClientException(ErrorResponseConstants.UNION_LOGIN_FAILED_CODE, ErrorResponseConstants.UNION_LOGIN_FAILED_MSG);
+        }
+    }
+
+    private String getMobileNoCheck(String uid) {
+        UserVo userInfo = userRpc.getUserInfo(uid);
+        if (userInfo == null) {
+            return null;
+        }
+        return userInfo.getMobile();
     }
 
 }

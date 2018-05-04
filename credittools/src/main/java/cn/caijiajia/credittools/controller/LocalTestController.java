@@ -48,6 +48,22 @@ public class LocalTestController {
 
 
     public static void main(String[] args) {
+        String str = "000001";
+        int lastZero = str.lastIndexOf("0");
+        System.out.println(lastZero);
+
+        Integer rank = Integer.parseInt(str.substring(str.lastIndexOf("0") + 1,str.length())) + 99;
+        String newStr = str.substring(0, str.length() - String.valueOf(rank).length()) + String.valueOf(rank);
+        System.out.println(newStr);
+
+        String str2 = "00001400020";
+        Integer b = Integer.valueOf(str2.replaceAll("^(0+)", "")) + 123;
+        String newStr2 = str.substring(0, str2.length() - String.valueOf(b).length()) + String.valueOf(b);
+        System.out.println(newStr2);
+
+    }
+
+    private static void demo1(){
         Date date1 = new Date(Long.valueOf("1524828100946"));
         System.out.println(date1);
         System.out.println(String.valueOf(new Date().getTime() /1000));
@@ -70,7 +86,5 @@ public class LocalTestController {
             str = str + stri;
         }
         System.out.println(str);
-
-//        Double b = new Double();
     }
 }
