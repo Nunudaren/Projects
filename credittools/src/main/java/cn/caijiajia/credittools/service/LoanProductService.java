@@ -376,7 +376,7 @@ public class LoanProductService {
                         .feeRate(input.getShowFeeRate() ? input.getFeeRate() : null)
                         .iconUrl(input.getIconUrl())
                         .id(input.getProductId())
-                        .jumpUrl(input.getJumpUrl() + "&p_u=" + ParameterThreadLocal.getUid())
+                        .jumpUrl(input.getJumpUrl() + (ParameterThreadLocal.getUid() == null? "" : "&p_u=" + ParameterThreadLocal.getUid()))
                         .mark(input.getMark())
                         .name(input.getName())
                         .promotion(input.getPromotion())
