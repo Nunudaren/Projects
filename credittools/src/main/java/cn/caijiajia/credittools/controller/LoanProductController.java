@@ -2,6 +2,8 @@ package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.service.LoanProductService;
+import cn.caijiajia.credittools.service.LoanProductsService;
+import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
 import cn.caijiajia.credittools.vo.ProductListClientVo;
 import cn.caijiajia.credittools.vo.ProductVo;
@@ -21,6 +23,9 @@ public class LoanProductController {
 
     @Autowired
     private LoanProductService loanProductService;
+
+    @Autowired
+    private LoanProductsService loanProductsService;
 
     @RequestMapping(value = "/editProduct", method = RequestMethod.POST)
     public void addOrUpdateProduct(@RequestBody ProductForm productForm) {
@@ -70,7 +75,7 @@ public class LoanProductController {
     /**
      * 贷款产品聚合页，获取贷款产品列表
      */
-    @RequestMapping(value = "/getLoanProductList", method = RequestMethod.GET)
+    @RequestMapping(value = "/v2/getLoanProductList", method = RequestMethod.GET)
     public ProductListClientVo getLoanProductListClient(ProductListClientForm productListClientForm) {
         return loanProductService.getProductListClient(productListClientForm);
     }
@@ -84,4 +89,16 @@ public class LoanProductController {
     public void changeProductStatus(StatusForm statusForm) {
         loanProductService.updateLineStatus(statusForm);
     }
+
+    /**
+     * 贷款产品聚合页，获取筛选选项接口
+     *
+     * @return
+     */
+    @RequestMapping(value = "/getLoanProductFilter", method = RequestMethod.GET)
+    public LoanProductFilterVo getLoanProductFilter() {
+        return loanProductsService.getLoanProductFilter();
+    }
+
+
 }

@@ -11,6 +11,8 @@ package cn.caijiajia.credittools.configuration;
 
 import cn.caijiajia.confplus.client.annotation.AppConf;
 import cn.caijiajia.confplus.client.annotation.ConfElement;
+import cn.caijiajia.credittools.bo.LoanProductBo;
+import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import org.springframework.stereotype.Component;
 import lombok.Data;
 
@@ -31,4 +33,10 @@ public class Configs {
 
     @ConfElement(name = "loanproduct_loanproducts_guide_words")
     private String guideWords;
+
+    @ConfElement(name = "loanproduct_loanproducts_filters")
+    private LoanProductFilterVo loanProductFilters;
+
+    @ConfElement(name = "loanproduct_loanproducts_products")
+    private List<LoanProductBo> loanProducts;
 }
