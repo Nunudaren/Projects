@@ -49,11 +49,13 @@ public class YouyuUnionLoginService implements IProductsService {
     private CreditDataDelegate creditDataDelegate;
     @Autowired
     private HttpClientTemplate httpClientTemplate;
+    @Autowired
+    private LoanProductService loanProductService;
 
     @Override
     public String unionLogin(String uid, String key) {
 
-        String jumpUrl = getUnionLoginUrl(key);
+        String jumpUrl = loanProductService.getUnionLoginUrl(key);
         String mobile = getMobile(uid);
         DeviceInfoResp deviceInfoResp;
         DeviceEventDetailResp deviceEventDetailResp;
@@ -133,15 +135,6 @@ public class YouyuUnionLoginService implements IProductsService {
         param.put("key", KEY);
         param.put("sign", signStr);
         return param;
-    }
-
-    private String getUnionLoginUrl(String key) {
-        final Map<String, String> unionLoginUrl = configs.getUnionLoginUrl();
-        if (MapUtils.isNotEmpty(unionLoginUrl)) {
-            return unionLoginUrl.get(key);
-        }
-        log.error("未配置联合登录Url, loanmarket_union_login_url");
-        throw new CjjClientException(ErrorResponseConstants.GET_UNION_URL_ERR_CODE, ErrorResponseConstants.GET_UNION_URL_ERR_MSG);
     }
 
     @Override
