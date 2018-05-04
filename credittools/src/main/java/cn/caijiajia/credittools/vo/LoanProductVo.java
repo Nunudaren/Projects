@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 public class LoanProductVo {
 
-    /** 总个数 */
+    /** 总记录 */
     private Integer totalCount;
 
     /** 交易列表 */

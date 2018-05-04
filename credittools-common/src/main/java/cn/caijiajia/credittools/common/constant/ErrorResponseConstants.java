@@ -25,7 +25,10 @@ public class ErrorResponseConstants {
     public static final Integer CHANGE_PRODUCT_RANK_FAILED_CODE = 0002;
     public static final String CHANGE_PRODUCT_RANK_FAILED_MSG = "更改产品位置序号失败";
 
-    public static final Integer CHANGE_PRODUCT_STATUS_FAILED_CODE = 0003;
+    public static final Integer CHANGED_RANK_OVERFLOW_CODE = 0003;
+    public static final String CHANGED_RANK_OVERFLOW_MSG = "输入产品位置序号大于当前总记录条数";
+
+    public static final Integer CHANGE_PRODUCT_STATUS_FAILED_CODE = 0004;
     public static final String CHANGE_PRODUCT_STATUS_FAILED_MSG = "更改产品上下线状态失败";
 
     public static final int ERR_RESX_UPLOAD_FAILURE_CODE = 9458;
