@@ -26,6 +26,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
@@ -438,19 +439,33 @@ public class LoanProductService {
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
         String uid = request.getParameter("p_u");
         String key = request.getParameter("key");
-        String mobile = getMobileNoCheck(uid);
-        IProductsService productsService = productsFactory.getProductService(key);
-        String jumpUrl = productsService.unionLogin(uid, key);
+        String jumpUrl;
+        if(StringUtils.isEmpty(uid)){
+            jumpUrl = getUnionLoginUrl(key);
+        }else{
+            String mobile = getMobileNoCheck(uid);
+            IProductsService productsService = productsFactory.getProductService(key);
+            jumpUrl = productsService.unionLogin(uid, key);
 
-        final String channelName = productsService.getChannelName();
+            final String channelName = productsService.getChannelName();
 
-        unionLoginLogService.addUnionLoginLog(uid, channelName, mobile);
+            unionLoginLogService.addUnionLoginLog(uid, channelName, mobile);
+        }
 
         try {
             response.sendRedirect(jumpUrl);
         } catch (IOException e) {
             throw new CjjClientException(ErrorResponseConstants.UNION_LOGIN_FAILED_CODE, ErrorResponseConstants.UNION_LOGIN_FAILED_MSG);
         }
+    }
+
+    public String getUnionLoginUrl(String key){
+        final Map<String, String> unionLoginUrl = configs.getUnionLoginUrl();
+        if(MapUtils.isNotEmpty(unionLoginUrl)){
+            return unionLoginUrl.get(key);
+        }
+        log.error("未配置联合登录Url, loanmarket_union_login_url");
+        throw new CjjClientException(ErrorResponseConstants.GET_UNION_URL_ERR_CODE, ErrorResponseConstants.GET_UNION_URL_ERR_MSG);
     }
 
     private String getMobileNoCheck(String uid) {
