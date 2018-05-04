@@ -82,7 +82,6 @@ public class LoanProductService {
         ProductExample example = new ProductExample();
         example.setOrderByClause("rank asc");
         ProductExample.Criteria criteria = example.createCriteria();
-        Integer total = productMapper.countByExample(example);
 
         if (StringUtils.isNotEmpty(loanProductListForm.getProductName())) {
             criteria.andNameIsNotNull().andNameLike("%" + loanProductListForm.getProductName() + "%");
@@ -95,6 +94,7 @@ public class LoanProductService {
         }
         PageHelper.startPage(loanProductListForm.getPageNo(), loanProductListForm.getPageSize());
         List<Product> productList = productMapper.selectByExample(example);
+        Integer total = productMapper.countByExample(example);
         PageInfo<LoanProductListVo> pageInfo = transForm(productList);
 
         return LoanProductVo.builder()
@@ -111,13 +111,13 @@ public class LoanProductService {
                     .productId(product.getProductId())
                     .productName(product.getName())
                     .iconUrl(product.getIconUrl())
-                    .onlineTime(product.getOnlinetime() == null ? ""  : DateUtil.convert2Str(product.getOnlinetime(), DateUtil.NYRSF))
+                    .onlineTime(product.getOnlinetime() == null ? "" : DateUtil.convert2Str(product.getOnlinetime(), DateUtil.NYRSF))
                     .offlineTime(product.getOfflinetime() == null ? "" : DateUtil.convert2Str(product.getOfflinetime(), DateUtil.NYRSF))
                     .status(product.getStatus() ? "1" : "0")//1：上线 0：下线
                     .build();
             productVoList.add(loanProductListVo);
         }
-        return  new PageInfo<LoanProductListVo>(productVoList);
+        return new PageInfo<LoanProductListVo>(productVoList);
     }
 
     /**
@@ -125,7 +125,10 @@ public class LoanProductService {
      *
      * @param rankForm
      */
-    public void upateRankByProductId(RankForm rankForm) {
+        public void upateRankByProductId(RankForm rankForm) {
+        if (rankForm.getChangedRank() > getMaxRank()) {
+            throw new CjjServerException(ErrorResponseConstants.CHANGED_RANK_OVERFLOW_CODE, ErrorResponseConstants.CHANGED_RANK_OVERFLOW_MSG);
+        }
         ProductExample example = new ProductExample();
         ProductExample.Criteria criteria = example.or();
         if (rankForm.getCurrentRank() == rankForm.getChangedRank()) {
@@ -189,7 +192,6 @@ public class LoanProductService {
                 update.setOfflinetime(null);
                 update.setOnlinetime(new Date());
             } else {
-                update.setOnlinetime(null);
                 update.setOfflinetime(new Date());
             }
             productMapper.updateByPrimaryKey(update);
@@ -340,11 +342,11 @@ public class LoanProductService {
         criteria.andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
         if (StringUtils.isEmpty(productListClientForm.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientForm.getSortValue())) {
             productExample.setOrderByClause("rank asc");
-        } else if(ProductSortEnum.LEND_FAST.getValue().equals(productListClientForm.getSortValue())){
+        } else if (ProductSortEnum.LEND_FAST.getValue().equals(productListClientForm.getSortValue())) {
             productExample.setOrderByClause("lend_time asc");
-        } else if(ProductSortEnum.FEE_RATE_LOW.getValue().equals(productListClientForm.getSortValue())){
+        } else if (ProductSortEnum.FEE_RATE_LOW.getValue().equals(productListClientForm.getSortValue())) {
             productExample.setOrderByClause("annual_rate asc");
-        } else if(ProductSortEnum.PASS_RATE_HIGH.getValue().equals(productListClientForm.getSortValue())){
+        } else if (ProductSortEnum.PASS_RATE_HIGH.getValue().equals(productListClientForm.getSortValue())) {
             productExample.setOrderByClause("pass_rate desc");
         }
         if (null == productListClientForm.getFilterType() || StringUtils.isEmpty(productListClientForm.getFilterValue())) {
