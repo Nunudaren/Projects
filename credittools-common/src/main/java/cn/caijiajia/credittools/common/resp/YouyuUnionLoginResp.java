@@ -1,4 +1,4 @@
-package cn.caijiajia.loanmarket.common.resp;
+package cn.caijiajia.credittools.common.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

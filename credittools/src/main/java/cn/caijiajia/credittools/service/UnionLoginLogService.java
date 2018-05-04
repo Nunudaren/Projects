@@ -7,10 +7,10 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.loanmarket.service.products;
+package cn.caijiajia.credittools.service;
 
-import cn.caijiajia.loanmarket.domain.UnionLoginLog;
-import cn.caijiajia.loanmarket.mapper.UnionLoginLogMapper;
+import cn.caijiajia.credittools.domain.UnionLoginLog;
+import cn.caijiajia.credittools.mapper.UnionLoginLogMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

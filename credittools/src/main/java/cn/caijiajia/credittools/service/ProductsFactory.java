@@ -9,8 +9,27 @@
  */
 package cn.caijiajia.credittools.service;
 
+import cn.caijiajia.credittools.utils.SpringContextWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 /**
  * Created by liujianyang on 2018/5/4.
  */
+@Service
+@Slf4j
 public class ProductsFactory {
+
+    public IProductsService getProductService(String key) {
+        Class clz = null;
+        switch (key) {
+            case "qihu" :
+                clz = QihuService.class;
+                break;
+            case "youyu" :
+                clz = YouyuUnionLoginService.class;
+                break;
+        }
+        return  SpringContextWrapper.getBeanByClz(clz);
+    }
 }

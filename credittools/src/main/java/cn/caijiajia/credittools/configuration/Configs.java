@@ -39,4 +39,7 @@ public class Configs {
 
     @ConfElement(name = "loanproduct_loanproducts_products")
     private List<LoanProductBo> loanProducts;
+
+    @ConfElement(name = "loanmarket_union_login_url")
+    private Map<String, String> unionLoginUrl;
 }

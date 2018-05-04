@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
 
@@ -100,5 +102,15 @@ public class LoanProductController {
         return loanProductsService.getLoanProductFilter();
     }
 
+    /**
+     * 贷款产品联合登陆
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/union/login", method = RequestMethod.GET)
+    public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
+        loanProductService.unionLogin(request, response);
+    }
 
 }

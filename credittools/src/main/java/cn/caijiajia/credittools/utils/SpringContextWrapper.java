@@ -1,4 +1,4 @@
-package cn.caijiajia.apiproduct.utils;
+package cn.caijiajia.credittools.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

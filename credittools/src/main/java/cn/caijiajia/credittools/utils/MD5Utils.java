@@ -1,4 +1,4 @@
-package cn.caijiajia.loanmarket.util;
+package cn.caijiajia.credittools.utils;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;

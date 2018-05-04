@@ -7,14 +7,14 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.loanmarket.delegate;
+package cn.caijiajia.credittools.delegator;
 
+import cn.caijiajia.credittools.common.resp.QihuResp;
+import cn.caijiajia.credittools.utils.Base64Utils;
+import cn.caijiajia.credittools.utils.CommonUtil;
+import cn.caijiajia.credittools.utils.RSAUtils;
 import cn.caijiajia.framework.exceptions.CjjServerException;
 import cn.caijiajia.framework.httpclient.HttpClientTemplate;
-import cn.caijiajia.loanmarket.common.resp.QihuResp;
-import cn.caijiajia.loanmarket.util.Base64Utils;
-import cn.caijiajia.loanmarket.util.CommonUtil;
-import cn.caijiajia.loanmarket.util.RSAUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;

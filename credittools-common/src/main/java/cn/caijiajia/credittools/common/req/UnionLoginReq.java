@@ -7,7 +7,7 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.loanmarket.common.req;
+package cn.caijiajia.credittools.common.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

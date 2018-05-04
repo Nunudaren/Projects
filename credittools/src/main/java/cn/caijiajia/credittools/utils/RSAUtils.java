@@ -1,4 +1,4 @@
-package cn.caijiajia.loanmarket.util;
+package cn.caijiajia.credittools.utils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

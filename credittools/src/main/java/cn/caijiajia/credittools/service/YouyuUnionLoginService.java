@@ -1,15 +1,14 @@
-package cn.caijiajia.loanmarket.service.products;
+package cn.caijiajia.credittools.service;
 
 import cn.caijiajia.creditdata.common.req.operator.CityCodeReq;
-import cn.caijiajia.creditdata.rpc.LocationRpc;
+import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.credittools.common.resp.YouyuUnionLoginResp;
+import cn.caijiajia.credittools.configuration.Configs;
+import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
+import cn.caijiajia.credittools.delegator.CreditDataDelegate;
+import cn.caijiajia.credittools.utils.MD5Utils;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.httpclient.HttpClientTemplate;
-import cn.caijiajia.loanmarket.common.constant.UnionLoginChannelEnum;
-import cn.caijiajia.loanmarket.common.resp.YouyuUnionLoginResp;
-import cn.caijiajia.loanmarket.configuration.Configs;
-import cn.caijiajia.loanmarket.constant.ErrorResponseConstants;
-import cn.caijiajia.loanmarket.delegate.CreditDataDelegate;
-import cn.caijiajia.loanmarket.util.MD5Utils;
 import cn.caijiajia.user.common.resp.UserVo;
 import cn.caijiajia.user.rpc.UserRpc;
 import cn.caijiajia.userloan.common.resp.DeviceEventDetailResp;

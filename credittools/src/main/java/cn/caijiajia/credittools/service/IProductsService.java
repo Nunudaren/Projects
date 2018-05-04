@@ -12,5 +12,9 @@ package cn.caijiajia.credittools.service;
 /**
  * Created by liujianyang on 2018/5/4.
  */
-public class IProductsService {
+public interface IProductsService {
+    // 联合登陆，获得jumpUrl
+    String unionLogin(String uid, String key);
+
+    String getChannelName();
 }
