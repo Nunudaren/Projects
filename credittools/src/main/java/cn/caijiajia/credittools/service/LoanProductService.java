@@ -18,6 +18,7 @@ import cn.caijiajia.framework.exceptions.CjjServerException;
 import cn.caijiajia.framework.threadlocal.ParameterThreadLocal;
 import cn.caijiajia.loanproduct.common.Resp.LoanProductResp;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -63,11 +64,11 @@ public class LoanProductService {
      * @param loanProductListForm
      * @return
      */
-    public List<LoanProductListVo> getProductList(LoanProductListForm loanProductListForm) {
-        PageHelper.startPage(loanProductListForm.getPageNo(), loanProductListForm.getPageSize());
+    public LoanProductVo getProductList(LoanProductListForm loanProductListForm) {
         ProductExample example = new ProductExample();
         example.setOrderByClause("rank asc");
-        ProductExample.Criteria criteria = example.or();
+        ProductExample.Criteria criteria = example.createCriteria();
+        Integer total = productMapper.countByExample(example);
 
         if (StringUtils.isNotEmpty(loanProductListForm.getProductName())) {
             criteria.andNameIsNotNull().andNameLike("%" + loanProductListForm.getProductName() + "%");
@@ -75,16 +76,20 @@ public class LoanProductService {
         if (StringUtils.isNotEmpty(loanProductListForm.getProductId())) {
             criteria.andProductIdIsNotNull().andProductIdEqualTo(loanProductListForm.getProductId());
         }
-        if (StringUtils.isNotEmpty(loanProductListForm.getStatus())) {
-            criteria.andStatusIsNotNull().andStatusEqualTo(loanProductListForm.getStatus().equals("1") ? true : false);
+        if (!CredittoolsConstants.ALL_STATUS.equals(loanProductListForm.getStatus())) {
+            criteria.andStatusIsNotNull().andStatusEqualTo(loanProductListForm.getStatus().equals("1"));
         }
+        PageHelper.startPage(loanProductListForm.getPageNo(), loanProductListForm.getPageSize());
         List<Product> productList = productMapper.selectByExample(example);
-        List<LoanProductListVo> productVoList = transForm(productList);
+        PageInfo<LoanProductListVo> pageInfo = transForm(productList);
 
-        return productVoList;
+        return LoanProductVo.builder()
+                .totalCount(total)
+                .productVoList(pageInfo.getList())
+                .build();
     }
 
-    private List<LoanProductListVo> transForm(List<Product> productList) {
+    private PageInfo<LoanProductListVo> transForm(List<Product> productList) {
         List<LoanProductListVo> productVoList = Lists.newArrayList();
         for (Product product : productList) {
             LoanProductListVo loanProductListVo = LoanProductListVo.builder()
@@ -92,13 +97,13 @@ public class LoanProductService {
                     .productId(product.getProductId())
                     .productName(product.getName())
                     .iconUrl(product.getIconUrl())
-                    .onlineTime(DateUtil.convert2Str(product.getOnlinetime(), DateUtil.NYRSF))
-                    .offlineTime(DateUtil.convert2Str(product.getOfflinetime(), DateUtil.NYRSF))
+                    .onlineTime(product.getOnlinetime() == null ? ""  : DateUtil.convert2Str(product.getOnlinetime(), DateUtil.NYRSF))
+                    .offlineTime(product.getOfflinetime() == null ? "" : DateUtil.convert2Str(product.getOfflinetime(), DateUtil.NYRSF))
                     .status(product.getStatus() ? "1" : "0")//1：上线 0：下线
                     .build();
             productVoList.add(loanProductListVo);
         }
-        return productVoList;
+        return  new PageInfo<LoanProductListVo>(productVoList);
     }
 
     /**
@@ -202,7 +207,6 @@ public class LoanProductService {
             product.setAomountFirst(productForm.getAmountFirst());
             product.setOfflinetime(new Date());
             product.setRank(getMaxRank() + 1);
-            //TODO 产品编号
             product.setProductId(createProductId());
             productMapper.insertSelective(product);
         } else {

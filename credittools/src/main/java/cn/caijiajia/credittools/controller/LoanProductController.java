@@ -3,6 +3,7 @@ package cn.caijiajia.credittools.controller;
 import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductListVo;
+import cn.caijiajia.credittools.vo.LoanProductVo;
 import cn.caijiajia.credittools.vo.ProductListClientVo;
 import cn.caijiajia.credittools.vo.ProductVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class LoanProductController {
      * @return
      */
     @RequestMapping(value = "/getProductList", method = RequestMethod.POST)
-    public List<LoanProductListVo> getProductList(@RequestBody LoanProductListForm loanProductListForm) {
+    public LoanProductVo getProductList(@RequestBody LoanProductListForm loanProductListForm) {
         return loanProductService.getProductList(loanProductListForm);
     }
 
