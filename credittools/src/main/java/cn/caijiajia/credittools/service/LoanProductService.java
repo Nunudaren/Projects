@@ -118,7 +118,7 @@ public class LoanProductService {
                     .build();
             productVoList.add(loanProductListVo);
         }
-        return new PageInfo<LoanProductListVo>(productVoList);
+        return new PageInfo<>(productVoList);
     }
 
     /**
@@ -218,8 +218,8 @@ public class LoanProductService {
     public void addOrUpdateProduct(ProductForm productForm) {
         if (productForm.getId() == null) {
             Product product = new Product();
-            product.setTags(StringUtils.join(productForm.getTags().toArray(), CredittoolsConstants.SPLIT_MARK));
             BeanUtils.copyProperties(productForm, product);
+            product.setTags(StringUtils.join(productForm.getTags().toArray(), CredittoolsConstants.SPLIT_MARK));
             product.setStatus(false);
             product.setAomountFirst(productForm.getAmountFirst());
             product.setOfflinetime(new Date());
@@ -280,8 +280,24 @@ public class LoanProductService {
         return productVo;
     }
 
+    /**
+     * 获取配置项标签
+     *
+     * @return
+     */
+    public List<String> getLoanProductTags() {
+        List<String> tags = Lists.newArrayList();
+        if (null != configs.getLoanProductTags()) {
+            tags = configs.getLoanProductTags();
+        }
+        return tags;
+    }
+
     private void setTagList(ProductVo productVo, Product product) {
-        List<String> tag = Arrays.asList(product.getTags().split(CredittoolsConstants.SPLIT_MARK));
+        List<String> tag = Lists.newArrayList();
+        if(StringUtils.isNotEmpty(product.getTags())){
+            tag = Arrays.asList(product.getTags().split(CredittoolsConstants.SPLIT_MARK));
+        }
         productVo.setTags(tag);
     }
 
@@ -421,19 +437,6 @@ public class LoanProductService {
             optionalInfo.set(1, temp);
         }
         return optionalInfo;
-    }
-
-    /**
-     * 获取配置项标签
-     *
-     * @return
-     */
-    public List<String> getLoanProductTags() {
-        List<String> tags = Lists.newArrayList();
-        if (null != configs.getLoanProductTags()) {
-            tags = configs.getLoanProductTags();
-        }
-        return tags;
     }
 
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {

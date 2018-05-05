@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,6 +59,15 @@ public class LoanProductController {
     @RequestMapping(value = "/changeProductRank", method = RequestMethod.POST)
     public void changeRankByProductId(@RequestBody RankForm rankForm) {
         loanProductService.upateRankByProductId(rankForm);
+    }
+
+    /**
+     * 获取配置项标签
+     * @return
+     */
+    @RequestMapping(value = "/productConfigTags", method = RequestMethod.GET)
+    public List<String> getLoanProductTags(){
+        return loanProductService.getLoanProductTags();
     }
 
     /**
