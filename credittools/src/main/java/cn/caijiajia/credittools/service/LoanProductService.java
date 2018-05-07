@@ -246,7 +246,7 @@ public class LoanProductService {
 
     private String getMaxProductId() {
         ProductExample example = new ProductExample();
-        example.setOrderByClause("rank desc");
+        example.setOrderByClause("product_id desc");
         List<Product> productList = productMapper.selectByExample(example);
         if (CollectionUtils.isEmpty(productList)) {
             return CredittoolsConstants.PRODUCT_ID_INITIAL_VALUE;
