@@ -159,6 +159,7 @@ public class LoanProductService {
             }
             Product toUpdate = getProductById(rankForm.getProductId());
             toUpdate.setRank(rankForm.getChangedRank());
+            toUpdate.setUpdatedAt(new Date());
             productMapper.updateByPrimaryKeySelective(toUpdate);
             txManager.commit(transactionStatus);
         } catch (Exception e) {
@@ -187,8 +188,7 @@ public class LoanProductService {
                 log.warn("要修改的状态和当前产品的数据库状态一致，用户可能没有刷新页面");
                 return;
             }
-            Product update = new Product();
-            BeanUtils.copyProperties(productList.get(0), update);
+            Product update = productList.get(0);
             update.setStatus(statusForm.getStatus().equals("1") ? true : false);
             if (update.getStatus()) {
                 update.setOfflinetime(null);
@@ -196,6 +196,7 @@ public class LoanProductService {
             } else {
                 update.setOfflinetime(new Date());
             }
+            update.setUpdatedAt(new Date());
             productMapper.updateByPrimaryKey(update);
         } else {
             log.error("更新产品位置序号失败！");
@@ -231,6 +232,7 @@ public class LoanProductService {
             Product product = getProductById(productForm.getId());
             BeanUtils.copyProperties(productForm, product);
             product.setTags(StringUtils.join(productForm.getTags().toArray(), CredittoolsConstants.SPLIT_MARK));
+            product.setUpdatedAt(new Date());
             productMapper.updateByPrimaryKey(product);
         }
     }
