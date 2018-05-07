@@ -10,4 +10,6 @@ public class CredittoolsConstants {
     public static final String PRODUCT_ID_INITIAL_VALUE = "000000";
 
     public static final String ALL_STATUS = "all";
+
+    public static final String PRODUCT_TAGS = "PRODUCT_TAGS";
 }

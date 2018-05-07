@@ -2,6 +2,7 @@ package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.service.LoanProductService;
+import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import cn.caijiajia.credittools.vo.LoanProductVo;
 import cn.caijiajia.credittools.vo.ProductListClientVo;
 import cn.caijiajia.credittools.vo.ProductVo;
@@ -71,11 +72,13 @@ public class LoanProductController {
     }
 
     /**
-     * 获取使用到的标签
+     * 贷款产品聚合页，获取筛选选项接口
+     *
+     * @return
      */
-    @RequestMapping(value = "/usedTag", method = RequestMethod.GET)
-    public Set<String> getUsedTags() {
-        return loanProductService.getUsedTags();
+    @RequestMapping(value = "/getLoanProductFilter", method = RequestMethod.GET)
+    public LoanProductFilterVo getLoanProductFilter() {
+        return loanProductService.getLoanProductFilter();
     }
 
     /**

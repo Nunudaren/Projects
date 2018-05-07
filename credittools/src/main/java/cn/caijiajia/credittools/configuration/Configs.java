@@ -12,6 +12,7 @@ package cn.caijiajia.credittools.configuration;
 import cn.caijiajia.confplus.client.annotation.AppConf;
 import cn.caijiajia.confplus.client.annotation.ConfElement;
 import cn.caijiajia.credittools.bo.LoanProductBo;
+import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import org.springframework.stereotype.Component;
 import lombok.Data;
 
@@ -38,4 +39,7 @@ public class Configs {
 
     @ConfElement(name = "loanmarket_union_login_url")
     private Map<String, String> unionLoginUrl;
+
+    @ConfElement(name = "loanproduct_loanproducts_filters")
+    private LoanProductFilterVo loanProductFilters;
 }
