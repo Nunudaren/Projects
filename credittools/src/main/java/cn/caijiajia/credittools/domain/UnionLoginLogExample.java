@@ -465,6 +465,66 @@ public class UnionLoginLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andOldUserIsNull() {
+            addCriterion("`old_user` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserIsNotNull() {
+            addCriterion("`old_user` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserEqualTo(Boolean value) {
+            addCriterion("`old_user` =", value, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserNotEqualTo(Boolean value) {
+            addCriterion("`old_user` <>", value, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserGreaterThan(Boolean value) {
+            addCriterion("`old_user` >", value, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserGreaterThanOrEqualTo(Boolean value) {
+            addCriterion("`old_user` >=", value, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserLessThan(Boolean value) {
+            addCriterion("`old_user` <", value, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserLessThanOrEqualTo(Boolean value) {
+            addCriterion("`old_user` <=", value, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserIn(List<Boolean> values) {
+            addCriterion("`old_user` in", values, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserNotIn(List<Boolean> values) {
+            addCriterion("`old_user` not in", values, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserBetween(Boolean value1, Boolean value2) {
+            addCriterion("`old_user` between", value1, value2, "oldUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andOldUserNotBetween(Boolean value1, Boolean value2) {
+            addCriterion("`old_user` not between", value1, value2, "oldUser");
+            return (Criteria) this;
+        }
+
         public Criteria andCreatedAtIsNull() {
             addCriterion("`created_at` is null");
             return (Criteria) this;

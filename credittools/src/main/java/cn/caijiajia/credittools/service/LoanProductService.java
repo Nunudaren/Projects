@@ -2,6 +2,8 @@ package cn.caijiajia.credittools.service;
 
 import cn.caijiajia.cloud.service.FileUploadService;
 import cn.caijiajia.credittools.bo.LoanProductFilterBo;
+import cn.caijiajia.credittools.bo.UnionJumpBo;
+import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.configuration.Configs;
@@ -344,7 +346,7 @@ public class LoanProductService {
             rtnVo = configs.getLoanProductFilters();
         }
         for (LoanProductFilterBo loanProductFilterBo : rtnVo.getFilters()) {
-            if(CredittoolsConstants.PRODUCT_TAGS.equals(loanProductFilterBo.getName())){
+            if(ProductFilterTypeEnum.PRODUCT_TAGS == loanProductFilterBo.getType()){
                 Set<String> usedTags = getUsedTags();
                 List<LoanProductFilterBo.Option> options = transform(usedTags);
                 loanProductFilterBo.setOptions(options);
@@ -468,21 +470,21 @@ public class LoanProductService {
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
         String uid = request.getParameter("p_u");
         String key = request.getParameter("key");
-        String jumpUrl;
+        UnionJumpBo jumpBo;
         if(StringUtils.isEmpty(uid)){
-            jumpUrl = getUnionLoginUrl(key);
+            jumpBo = UnionJumpBo.builder().jumpUrl(getUnionLoginUrl(key)).build();
         }else{
             String mobile = getMobileNoCheck(uid);
             IProductsService productsService = productsFactory.getProductService(key);
-            jumpUrl = productsService.unionLogin(uid, key);
+            jumpBo = productsService.unionLogin(uid, key);
 
             final String channelName = productsService.getChannelName();
 
-            unionLoginLogService.addUnionLoginLog(uid, channelName, mobile);
+            unionLoginLogService.addUnionLoginLog(UnionLoginBo.builder().uid(uid).channel(channelName).mobile(mobile).isOldUser(jumpBo.getIsOldUser()).build());
         }
 
         try {
-            response.sendRedirect(jumpUrl);
+            response.sendRedirect(jumpBo.getJumpUrl());
         } catch (IOException e) {
             throw new CjjClientException(ErrorResponseConstants.UNION_LOGIN_FAILED_CODE, ErrorResponseConstants.UNION_LOGIN_FAILED_MSG);
         }

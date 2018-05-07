@@ -48,10 +48,12 @@ public interface UnionLoginLogMapper {
     @Insert({
         "insert into `union_login_log` (`id`, `uid`, ",
         "`channel`, `mobile`, ",
-        "`created_at`, `updated_at`)",
+        "`old_user`, `created_at`, ",
+        "`updated_at`)",
         "values (#{id,jdbcType=BIGINT}, #{uid,jdbcType=VARCHAR}, ",
         "#{channel,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, ",
-        "#{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP})"
+        "#{oldUser,jdbcType=BIT}, #{createdAt,jdbcType=TIMESTAMP}, ",
+        "#{updatedAt,jdbcType=TIMESTAMP})"
     })
     int insert(UnionLoginLog record);
 
@@ -79,7 +81,7 @@ public interface UnionLoginLogMapper {
      */
     @Select({
         "select",
-        "`id`, `uid`, `channel`, `mobile`, `created_at`, `updated_at`",
+        "`id`, `uid`, `channel`, `mobile`, `old_user`, `created_at`, `updated_at`",
         "from `union_login_log`",
         "where `id` = #{id,jdbcType=BIGINT}"
     })
@@ -121,6 +123,7 @@ public interface UnionLoginLogMapper {
         "set `uid` = #{uid,jdbcType=VARCHAR},",
           "`channel` = #{channel,jdbcType=VARCHAR},",
           "`mobile` = #{mobile,jdbcType=VARCHAR},",
+          "`old_user` = #{oldUser,jdbcType=BIT},",
           "`created_at` = #{createdAt,jdbcType=TIMESTAMP},",
           "`updated_at` = #{updatedAt,jdbcType=TIMESTAMP}",
         "where `id` = #{id,jdbcType=BIGINT}"
