@@ -1,6 +1,7 @@
 package cn.caijiajia.credittools.service;
 
 import cn.caijiajia.cloud.service.FileUploadService;
+import cn.caijiajia.credittools.bo.LoanProductFilterBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.configuration.Configs;
@@ -335,6 +336,31 @@ public class LoanProductService {
         }
 
         return set;
+    }
+
+    public LoanProductFilterVo getLoanProductFilter() {
+        LoanProductFilterVo rtnVo = new LoanProductFilterVo();
+        if (null != configs.getLoanProductFilters()) {
+            rtnVo = configs.getLoanProductFilters();
+        }
+        for (LoanProductFilterBo loanProductFilterBo : rtnVo.getFilters()) {
+            if(CredittoolsConstants.PRODUCT_TAGS.equals(loanProductFilterBo.getName())){
+                Set<String> usedTags = getUsedTags();
+                List<LoanProductFilterBo.Option> options = transform(usedTags);
+                loanProductFilterBo.setOptions(options);
+            }
+        }
+        return rtnVo;
+    }
+
+    private List<LoanProductFilterBo.Option> transform(Set<String> usedTags){
+        Collection<LoanProductFilterBo.Option> transform = Collections2.transform(usedTags, new Function<String, LoanProductFilterBo.Option>() {
+            @Override
+            public LoanProductFilterBo.Option apply(String input) {
+                return LoanProductFilterBo.Option.builder().desp(input).value(input).build();
+            }
+        });
+        return Lists.newArrayList(transform);
     }
 
     public ProductListClientVo getProductListClient(ProductListClientForm productListClientForm) {
