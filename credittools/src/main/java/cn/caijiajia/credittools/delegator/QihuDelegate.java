@@ -40,13 +40,14 @@ public class QihuDelegate {
     @Value("${qihu360.httpHost}")
     private String host;
 
+    @Autowired
+    private String hbChannel;
+
     private static final String FORMAT = "json";
 
     private static final String SIGN_TYPE = "RSA";
 
     private static final String VERSION = "1.0";
-
-    private static final String CHANNEL = "huanbei";
 
     public QihuResp invoke(Object request, String method) {
         try {
@@ -54,7 +55,7 @@ public class QihuDelegate {
             Map<String,String> paramMap = Maps.newHashMap();
 
             paramMap.put("biz_data", JSON.toJSONString(request));
-            paramMap.put("channel", CHANNEL);
+            paramMap.put("channel", hbChannel);
             paramMap.put("method", method);
             paramMap.put("sign_type", SIGN_TYPE);
             paramMap.put("timestamp", String.valueOf(new Date().getTime()/1000));

@@ -19,6 +19,9 @@ public class LoanProductSortBo {
     private List<Option> options;
 
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Option {
         private String desp;
         private String value;

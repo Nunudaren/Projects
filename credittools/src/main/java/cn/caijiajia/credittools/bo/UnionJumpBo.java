@@ -9,8 +9,19 @@
  */
 package cn.caijiajia.credittools.bo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * Created by liujianyang on 2018/5/7.
  */
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UnionJumpBo {
+    private String jumpUrl;
+    private Boolean isOldUser;
 }

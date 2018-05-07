@@ -11,5 +11,4 @@ public class CredittoolsConstants {
 
     public static final String ALL_STATUS = "all";
 
-    public static final String PRODUCT_TAGS = "PRODUCT_TAGS";
 }
