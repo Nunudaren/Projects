@@ -407,7 +407,7 @@ public class LoanProductService {
 
         } else if (ProductFilterTypeEnum.PRODUCT_TAGS == productListClientForm.getFilterType()) {
 
-            criteria.andTagsLike(productListClientForm.getFilterValue());
+            criteria.andTagsLike("%" + productListClientForm.getFilterValue() + "%");
             return productMapper.selectByExample(productExample);
         }
 
