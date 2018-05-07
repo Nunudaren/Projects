@@ -3,7 +3,6 @@ package cn.caijiajia.credittools.service;
 import cn.caijiajia.creditdata.common.req.operator.CityCodeReq;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.common.resp.YouyuUnionLoginResp;
-import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
 import cn.caijiajia.credittools.delegator.CreditDataDelegate;
 import cn.caijiajia.credittools.utils.MD5Utils;
@@ -17,13 +16,11 @@ import cn.caijiajia.userloan.rpc.DeviceInfoRpc;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Map;
 
@@ -34,13 +31,12 @@ import java.util.Map;
 @Service
 @Slf4j
 public class YouyuUnionLoginService implements IProductsService {
-    public static final String KEY = "b07c50861c163ba03c2079c2eaf112f1";
     public static final String COMFROM = "huanbei";
 
+    @Value("${youyu.key}")
+    private String key;
     @Value("${youyu.hostUrl}")
     private String youyuHostUrl;
-    @Resource
-    private Configs configs;
     @Autowired
     private UserRpc userRpc;
     @Autowired
@@ -59,7 +55,7 @@ public class YouyuUnionLoginService implements IProductsService {
         String mobile = getMobile(uid);
         DeviceInfoResp deviceInfoResp;
         DeviceEventDetailResp deviceEventDetailResp;
-        String cityCode = "";
+        String cityCode;
         try {
             deviceInfoResp = deviceInfoRpc.getUserDeviceInfo(uid);
             deviceEventDetailResp = deviceInfoResp.getDeviceEventDetailResp();
@@ -119,7 +115,7 @@ public class YouyuUnionLoginService implements IProductsService {
         toEncryptStr.append("imei").append("=").append(deviceEventDetailResp.getImei()).append("&");
         toEncryptStr.append("timeStamp").append("=").append(timeStamp).append("&");
         toEncryptStr.append("comeFrom").append("=").append(COMFROM).append("&");
-        toEncryptStr.append("key").append("=").append(KEY);
+        toEncryptStr.append("key").append("=").append(key);
 
         String signStr = MD5Utils.getMD5String(toEncryptStr.toString());
 
@@ -132,7 +128,7 @@ public class YouyuUnionLoginService implements IProductsService {
         param.put("imei", deviceEventDetailResp.getImei());
         param.put("timeStamp", timeStamp);
         param.put("comeFrom", COMFROM);
-        param.put("key", KEY);
+        param.put("key", key);
         param.put("sign", signStr);
         return param;
     }
