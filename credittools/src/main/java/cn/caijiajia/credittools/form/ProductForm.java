@@ -60,8 +60,5 @@ public class ProductForm {
         if (name.length() > 7 || (StringUtils.isNotEmpty(mark) && mark.length() > 7)) {
             throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, String.format(ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG, 7));
         }
-        if (promotion.length() > 24) {
-            throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, String.format(ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG, 24));
-        }
     }
 }

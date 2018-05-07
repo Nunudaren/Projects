@@ -22,6 +22,8 @@ public class LoanProductFilterBo {
 
     @Data
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Option {
         private String desp;
         private String value;

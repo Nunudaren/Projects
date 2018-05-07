@@ -9,6 +9,7 @@
  */
 package cn.caijiajia.credittools.service;
 
+import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.common.req.UnionLoginReq;
 import cn.caijiajia.credittools.common.resp.QihuResp;
@@ -37,9 +38,6 @@ public class QihuService implements IProductsService {
     private QihuDelegate qihuDelegate;
 
     @Autowired
-    private Configs configs;
-
-    @Autowired
     private UserRpc userRpc;
 
     @Autowired
@@ -48,17 +46,18 @@ public class QihuService implements IProductsService {
     private static final String METHOD = "user.unionlogin";
 
     @Override
-    public String unionLogin(String uid, String key) {
+    public UnionJumpBo unionLogin(String uid, String key) {
         String mobile = getMobile(uid);
+        UnionJumpBo jumpBo = UnionJumpBo.builder().jumpUrl(loanProductService.getUnionLoginUrl(key)).build();
         UnionLoginReq unionLoginReq = UnionLoginReq.builder().mobile(mobile).build();
         QihuResp qihuResp = qihuDelegate.invoke(unionLoginReq, METHOD);
         if (qihuResp.getCode() == 200) {
             if (qihuResp.getData() == null || StringUtils.isEmpty(qihuResp.getData().getLoginUrl())) {
-                return loanProductService.getUnionLoginUrl(key);
+                return jumpBo;
             }
-            return qihuResp.getData().getLoginUrl();
+            return UnionJumpBo.builder().jumpUrl(qihuResp.getData().getLoginUrl()).isOldUser(qihuResp.getData().getIsNew() != null ? qihuResp.getData().getIsNew() == 0  : null).build();
         } else {
-            return loanProductService.getUnionLoginUrl(key);
+            return jumpBo;
         }
     }
 

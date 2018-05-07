@@ -9,6 +9,7 @@
  */
 package cn.caijiajia.credittools.service;
 
+import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.domain.UnionLoginLog;
 import cn.caijiajia.credittools.mapper.UnionLoginLogMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +26,12 @@ public class UnionLoginLogService {
     @Autowired
     private UnionLoginLogMapper unionLoginLogMapper;
 
-    public void addUnionLoginLog(String uid, String channel, String mobile){
+    public void addUnionLoginLog(UnionLoginBo unionLoginBo){
         UnionLoginLog unionLoginLog = new UnionLoginLog();
-        unionLoginLog.setUid(uid);
-        unionLoginLog.setChannel(channel);
-        unionLoginLog.setMobile(mobile);
+        unionLoginLog.setUid(unionLoginBo.getUid());
+        unionLoginLog.setChannel(unionLoginBo.getChannel());
+        unionLoginLog.setMobile(unionLoginBo.getMobile());
+        unionLoginLog.setOldUser(unionLoginBo.getIsOldUser());
         unionLoginLogMapper.insertSelective(unionLoginLog);
     }
 }

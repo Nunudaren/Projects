@@ -7,16 +7,21 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.credittools.service;
+package cn.caijiajia.credittools.bo;
 
-import cn.caijiajia.credittools.bo.UnionJumpBo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * Created by liujianyang on 2018/5/4.
+ * Created by liujianyang on 2018/5/7.
  */
-public interface IProductsService {
-    // 联合登陆，获得jumpUrl
-    UnionJumpBo unionLogin(String uid, String key);
-
-    String getChannelName();
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class UnionJumpBo {
+    private String jumpUrl;
+    private Boolean isOldUser;
 }

@@ -1,6 +1,7 @@
 package cn.caijiajia.credittools.service;
 
 import cn.caijiajia.creditdata.common.req.operator.CityCodeReq;
+import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.common.resp.YouyuUnionLoginResp;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
@@ -49,7 +50,7 @@ public class YouyuUnionLoginService implements IProductsService {
     private LoanProductService loanProductService;
 
     @Override
-    public String unionLogin(String uid, String key) {
+    public UnionJumpBo unionLogin(String uid, String key) {
 
         String jumpUrl = loanProductService.getUnionLoginUrl(key);
         String mobile = getMobile(uid);
@@ -74,11 +75,11 @@ public class YouyuUnionLoginService implements IProductsService {
             cityCode = creditDataDelegate.getCityCode(cityCodeReq);
         } catch (Exception e) {
             log.warn("联合登陆所需请求参数获取失败：" + e);
-            return jumpUrl;
+            return UnionJumpBo.builder().jumpUrl(jumpUrl).build();
         }
         if (StringUtils.isEmpty(cityCode) || StringUtils.isEmpty(deviceEventDetailResp.getLongitude())
                 || StringUtils.isEmpty(deviceEventDetailResp.getLatitude()) || StringUtils.isEmpty(deviceEventDetailResp.getClientIp()) || StringUtils.isEmpty(mobile)) {
-            return jumpUrl;
+            return UnionJumpBo.builder().jumpUrl(jumpUrl).build();
         }
         Map<String, String> param = bulidUnionLoginReqParam(deviceEventDetailResp, cityCode, mobile);
         YouyuUnionLoginResp youyuUnionLoginResp;
@@ -92,7 +93,7 @@ public class YouyuUnionLoginService implements IProductsService {
         } catch (Exception e) {
             log.warn("youyu union login invoke error: ", e);
         }
-        return jumpUrl;
+        return UnionJumpBo.builder().jumpUrl(jumpUrl).build();
     }
 
     private String getMobile(String uid) {

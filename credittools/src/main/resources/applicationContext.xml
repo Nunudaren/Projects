@@ -59,6 +59,10 @@
         </property>
     </bean>
 
+    <bean id="hbChannel" class="java.lang.String">
+        <constructor-arg value="${qihu.hb.channel}"/>
+    </bean>
+
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
