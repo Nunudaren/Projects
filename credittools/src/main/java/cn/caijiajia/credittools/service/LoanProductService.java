@@ -129,7 +129,7 @@ public class LoanProductService {
      *
      * @param rankForm
      */
-        public void upateRankByProductId(RankForm rankForm) {
+    public void upateRankByProductId(RankForm rankForm) {
         if (rankForm.getChangedRank() > getMaxRank()) {
             throw new CjjServerException(ErrorResponseConstants.CHANGED_RANK_OVERFLOW_CODE, ErrorResponseConstants.CHANGED_RANK_OVERFLOW_MSG);
         }
@@ -249,18 +249,17 @@ public class LoanProductService {
         return products.get(0).getRank();
     }
 
-    private String getMaxProductId() {
+    private String createProductId() {
         ProductExample example = new ProductExample();
         example.setOrderByClause("product_id desc");
         List<Product> productList = productMapper.selectByExample(example);
         if (CollectionUtils.isEmpty(productList)) {
             return CredittoolsConstants.PRODUCT_ID_INITIAL_VALUE;
         }
-        return productList.get(0).getProductId();
+        return addSelfProductId(productList.get(0).getProductId());
     }
 
-    private String createProductId() {
-        String maxProductId = getMaxProductId();
+    private String addSelfProductId(String maxProductId) {
         if (maxProductId.length() > CredittoolsConstants.PRODUCT_ID_INITIAL_VALUE.length()) {
             return String.valueOf(Integer.valueOf(maxProductId) + 1);
         }
@@ -300,7 +299,7 @@ public class LoanProductService {
 
     private void setTagList(ProductVo productVo, Product product) {
         List<String> tag = Lists.newArrayList();
-        if(StringUtils.isNotEmpty(product.getTags())){
+        if (StringUtils.isNotEmpty(product.getTags())) {
             tag = Arrays.asList(product.getTags().split(CredittoolsConstants.SPLIT_MARK));
         }
         productVo.setTags(tag);
@@ -348,7 +347,7 @@ public class LoanProductService {
             rtnVo = configs.getLoanProductFilters();
         }
         for (LoanProductFilterBo loanProductFilterBo : rtnVo.getFilters()) {
-            if(ProductFilterTypeEnum.PRODUCT_TAGS == loanProductFilterBo.getType()){
+            if (ProductFilterTypeEnum.PRODUCT_TAGS == loanProductFilterBo.getType()) {
                 Set<String> usedTags = getUsedTags();
                 List<LoanProductFilterBo.Option> options = transform(usedTags);
                 loanProductFilterBo.setOptions(options);
@@ -357,7 +356,7 @@ public class LoanProductService {
         return rtnVo;
     }
 
-    private List<LoanProductFilterBo.Option> transform(Set<String> usedTags){
+    private List<LoanProductFilterBo.Option> transform(Set<String> usedTags) {
         Collection<LoanProductFilterBo.Option> transform = Collections2.transform(usedTags, new Function<String, LoanProductFilterBo.Option>() {
             @Override
             public LoanProductFilterBo.Option apply(String input) {
@@ -424,7 +423,7 @@ public class LoanProductService {
                         .feeRate(input.getShowFeeRate() ? input.getFeeRate() : null)
                         .iconUrl(input.getIconUrl())
                         .id(input.getProductId())
-                        .jumpUrl(input.getJumpUrl() + (ParameterThreadLocal.getUid() == null? "" : "&p_u=" + ParameterThreadLocal.getUid()))
+                        .jumpUrl(input.getJumpUrl() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()))
                         .mark(input.getMark())
                         .name(input.getName())
                         .promotion(input.getPromotion())
@@ -473,9 +472,9 @@ public class LoanProductService {
         String uid = request.getParameter("p_u");
         String key = request.getParameter("key");
         UnionJumpBo jumpBo;
-        if(StringUtils.isEmpty(uid)){
+        if (StringUtils.isEmpty(uid)) {
             jumpBo = UnionJumpBo.builder().jumpUrl(getUnionLoginUrl(key)).build();
-        }else{
+        } else {
             String mobile = getMobileNoCheck(uid);
             IProductsService productsService = productsFactory.getProductService(key);
             jumpBo = productsService.unionLogin(uid, key);
@@ -492,9 +491,9 @@ public class LoanProductService {
         }
     }
 
-    public String getUnionLoginUrl(String key){
+    public String getUnionLoginUrl(String key) {
         final Map<String, String> unionLoginUrl = configs.getUnionLoginUrl();
-        if(MapUtils.isNotEmpty(unionLoginUrl)){
+        if (MapUtils.isNotEmpty(unionLoginUrl)) {
             return unionLoginUrl.get(key);
         }
         log.error("未配置联合登录Url, loanmarket_union_login_url");
