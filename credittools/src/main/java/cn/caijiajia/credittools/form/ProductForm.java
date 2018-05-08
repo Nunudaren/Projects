@@ -57,8 +57,11 @@ public class ProductForm {
     private Boolean amountFirst;
 
     public void checkField() {
-        if (name.length() > 7 || (StringUtils.isNotEmpty(mark) && mark.length() > 7)) {
-            throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, String.format(ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG, 7));
+        if (name.length() > 7) {
+            throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, ErrorResponseConstants.FIELD_LENGTH_EXCESS_MSG);
+        }
+        if (StringUtils.isNotEmpty(mark) && mark.length() > 7) {
+            throw new CjjClientException(ErrorResponseConstants.FIELD_LENGTH_EXCESS_CODE, ErrorResponseConstants.MARK_FIELD_LENGTH_EXCESS_MSG);
         }
     }
 }
