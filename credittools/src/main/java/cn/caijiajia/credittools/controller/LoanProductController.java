@@ -1,10 +1,11 @@
 package cn.caijiajia.credittools.controller;
 
+import cn.caijiajia.credittools.common.req.ProductListClientReq;
 import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import cn.caijiajia.credittools.vo.LoanProductVo;
-import cn.caijiajia.credittools.vo.ProductListClientVo;
+import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.vo.ProductVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @Author:chendongdong
@@ -85,8 +85,8 @@ public class LoanProductController {
      * 贷款产品聚合页，获取贷款产品列表
      */
     @RequestMapping(value = "/getLoanProductList", method = RequestMethod.GET)
-    public ProductListClientVo getLoanProductListClient(ProductListClientForm productListClientForm) {
-        return loanProductService.getProductListClient(productListClientForm);
+    public ProductListClientResp getLoanProductListClient(ProductListClientReq productListClientReq) {
+        return loanProductService.getProductListClient(productListClientReq);
     }
 
     /**

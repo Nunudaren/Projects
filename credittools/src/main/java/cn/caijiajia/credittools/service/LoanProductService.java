@@ -6,8 +6,11 @@ import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.credittools.common.req.ProductListClientReq;
+import cn.caijiajia.credittools.common.resp.ProductClientResp;
+import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.configuration.Configs;
-import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
+import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.constant.ProductSortEnum;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductExample;
@@ -366,60 +369,60 @@ public class LoanProductService {
         return Lists.newArrayList(transform);
     }
 
-    public ProductListClientVo getProductListClient(ProductListClientForm productListClientForm) {
+    public ProductListClientResp getProductListClient(ProductListClientReq productListClientReq) {
         String guideWords = null;
-        List<Product> products = getProducts(productListClientForm);
+        List<Product> products = getProducts(productListClientReq);
         if (null != configs.getGuideWords()) {
             guideWords = configs.getGuideWords();
         }
-        List<ProductClientVo> rtnVo = Lists.newArrayList();
+        List<ProductClientResp> rtnVo = Lists.newArrayList();
         if (CollectionUtils.isNotEmpty(products)) {
             rtnVo = transform(products);
         }
-        return ProductListClientVo.builder()
+        return ProductListClientResp.builder()
                 .loanProductList(rtnVo)
                 .guideWords(guideWords)
                 .build();
     }
 
-    private List<Product> getProducts(ProductListClientForm productListClientForm) {
+    private List<Product> getProducts(ProductListClientReq productListClientReq) {
         ProductExample productExample = new ProductExample();
         ProductExample.Criteria criteria = productExample.createCriteria();
         criteria.andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
-        if (StringUtils.isEmpty(productListClientForm.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientForm.getSortValue())) {
+        if (StringUtils.isEmpty(productListClientReq.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("rank asc");
-        } else if (ProductSortEnum.LEND_FAST.getValue().equals(productListClientForm.getSortValue())) {
+        } else if (ProductSortEnum.LEND_FAST.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("lend_time asc");
-        } else if (ProductSortEnum.FEE_RATE_LOW.getValue().equals(productListClientForm.getSortValue())) {
+        } else if (ProductSortEnum.FEE_RATE_LOW.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("annual_rate asc");
-        } else if (ProductSortEnum.PASS_RATE_HIGH.getValue().equals(productListClientForm.getSortValue())) {
+        } else if (ProductSortEnum.PASS_RATE_HIGH.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("pass_rate desc");
         }
-        if (null == productListClientForm.getFilterType() || StringUtils.isEmpty(productListClientForm.getFilterValue())) {
+        if (null == productListClientReq.getFilterType() || StringUtils.isEmpty(productListClientReq.getFilterValue())) {
             return productMapper.selectByExample(productExample);
         }
-        if (ProductFilterTypeEnum.LEND_AMOUNT == productListClientForm.getFilterType()) {
-            String[] filterAmount = StringUtils.split(productListClientForm.getFilterValue(), ",");
+        if (ProductFilterTypeEnum.LEND_AMOUNT == productListClientReq.getFilterType()) {
+            String[] filterAmount = StringUtils.split(productListClientReq.getFilterValue(), ",");
             Integer filterMinAmount = Integer.parseInt(filterAmount[0]);
             Integer filterMaxAmount = Integer.parseInt(filterAmount[1]);
 
             criteria.andMinAmountLessThanOrEqualTo(filterMaxAmount).andMaxAmountGreaterThanOrEqualTo(filterMinAmount);
             return productMapper.selectByExample(productExample);
 
-        } else if (ProductFilterTypeEnum.PRODUCT_TAGS == productListClientForm.getFilterType()) {
+        } else if (ProductFilterTypeEnum.PRODUCT_TAGS == productListClientReq.getFilterType()) {
 
-            criteria.andTagsLike("%" + productListClientForm.getFilterValue() + "%");
+            criteria.andTagsLike("%" + productListClientReq.getFilterValue() + "%");
             return productMapper.selectByExample(productExample);
         }
 
         return null;
     }
 
-    private List<ProductClientVo> transform(List<Product> loanProducts) {
-        return Lists.newArrayList(Collections2.transform(loanProducts, new Function<Product, ProductClientVo>() {
+    private List<ProductClientResp> transform(List<Product> loanProducts) {
+        return Lists.newArrayList(Collections2.transform(loanProducts, new Function<Product, ProductClientResp>() {
             @Override
-            public ProductClientVo apply(Product input) {
-                return ProductClientVo.builder()
+            public ProductClientResp apply(Product input) {
+                return ProductClientResp.builder()
                         .feeRate(input.getShowFeeRate() ? input.getFeeRate() : null)
                         .iconUrl(input.getIconUrl())
                         .id(input.getProductId())
@@ -427,10 +430,10 @@ public class LoanProductService {
                         .mark(input.getMark())
                         .name(input.getName())
                         .promotion(input.getPromotion())
-                        .optionalInfo(Lists.newArrayList(Collections2.transform(buildOptionalInfo(input), new Function<LoanProductResp.OptionalInfo, ProductClientVo.OptionalInfo>() {
+                        .optionalInfo(Lists.newArrayList(Collections2.transform(buildOptionalInfo(input), new Function<LoanProductResp.OptionalInfo, ProductClientResp.OptionalInfo>() {
                             @Override
-                            public ProductClientVo.OptionalInfo apply(LoanProductResp.OptionalInfo input) {
-                                return ProductClientVo.OptionalInfo.builder().type(input.getType()).value(input.getValue()).build();
+                            public ProductClientResp.OptionalInfo apply(LoanProductResp.OptionalInfo input) {
+                                return ProductClientResp.OptionalInfo.builder().type(input.getType()).value(input.getValue()).build();
                             }
                         })))
                         .build();

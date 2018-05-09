@@ -7,7 +7,7 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.credittools.constant;
+package cn.caijiajia.credittools.common.constant;
 
 /**
  * Created by liujianyang on 2018/5/3.

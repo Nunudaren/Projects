@@ -7,9 +7,9 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.credittools.form;
+package cn.caijiajia.credittools.common.req;
 
-import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
+import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductListClientForm {
+public class ProductListClientReq {
     private ProductFilterTypeEnum filterType;
     private String filterValue;
     private String sortValue;
