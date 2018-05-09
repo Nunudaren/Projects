@@ -19,6 +19,10 @@
 		<module>credittools-common</module>
 	</modules>
 
+	<properties>
+		<rabbitmq.release.version>1.0.1-SNAPSHOT</rabbitmq.release.version>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -309,5 +313,16 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+
+	<profiles>
+		<profile>
+			<id>pro</id>
+			<properties>
+				<rabbitmq.release.version>1.0.1.RELEASE</rabbitmq.release.version>
+			</properties>
+		</profile>
+	</profiles>
+
 
 </project>
