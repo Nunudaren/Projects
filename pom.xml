@@ -102,7 +102,7 @@
 			<dependency>
 				<groupId>cn.caijiajia</groupId>
 				<artifactId>rabbitmq-client</artifactId>
-				<version>${project.release.version}</version>
+				<version>${rabbitmq.release.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
