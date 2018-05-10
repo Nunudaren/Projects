@@ -132,4 +132,6 @@ public interface ProductClickLogMapper {
     int updateByPrimaryKey(ProductClickLog record);
 
     List<ProductClickNumBo> getProductNum();
+
+    int insertAndClickTimeIncre(ProductClickLog record);
 }

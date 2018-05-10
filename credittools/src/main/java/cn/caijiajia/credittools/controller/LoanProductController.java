@@ -10,7 +10,6 @@
 package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.form.ProductListClientForm;
-import cn.caijiajia.credittools.service.LoanProductMgrService;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import cn.caijiajia.credittools.vo.ProductListClientVo;
@@ -49,7 +48,6 @@ public class LoanProductController {
         return loanProductService.getProductListClient(productListClientForm);
     }
 
-
     /**
      * 贷款产品联合登陆
      *
@@ -58,6 +56,6 @@ public class LoanProductController {
      */
     @RequestMapping(value = "/union/login", method = RequestMethod.GET)
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
-        loanProductService.unionLogin(request, response);
+        loanProductService.redirectUrl(request, response);
     }
 }

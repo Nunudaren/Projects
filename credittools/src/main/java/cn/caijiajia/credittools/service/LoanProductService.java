@@ -19,8 +19,10 @@ import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.constant.ProductSortEnum;
 import cn.caijiajia.credittools.domain.Product;
+import cn.caijiajia.credittools.domain.ProductClickLog;
 import cn.caijiajia.credittools.domain.ProductExample;
 import cn.caijiajia.credittools.form.ProductListClientForm;
+import cn.caijiajia.credittools.mapper.ProductClickLogMapper;
 import cn.caijiajia.credittools.mapper.ProductMapper;
 import cn.caijiajia.credittools.utils.MoneyUtil;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
@@ -41,6 +43,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +81,10 @@ public class LoanProductService {
     private LoanProductMgrService loanProductMgrService;
 
     @Autowired
-    private ProductClickLogService productClickLogService;
+    private ProductClickLogMapper productClickLogMapper;
+
+    @Autowired
+    private ThreadPoolTaskExecutor taskExecutor;
 
 
     public LoanProductFilterVo getLoanProductFilter() {
@@ -152,7 +158,7 @@ public class LoanProductService {
         if (1 == configs.getClickNumSwitch()) {
             productUserNum = configs.getProductClickNum();
         }
-        List<ProductClickNumBo> productClickNum = productClickLogService.getProductClickNum();
+        List<ProductClickNumBo> productClickNum = getProductClickNum();
         if(CollectionUtils.isEmpty(productClickNum) && MapUtils.isEmpty(productUserNum)){
             throw new CjjClientException(ErrorResponseConstants.GET_USER_CLICK_NUM_FAILED_CODE, ErrorResponseConstants.GET_USER_CLICK_NUM_FAILED_MSG);
         }
@@ -163,6 +169,10 @@ public class LoanProductService {
             productUserNum.put(productClickNumBo.getProductId(), productClickNumBo.getClickNum() + (productUserNum.get(productClickNumBo.getProductId()) == null ? 0 : productUserNum.get(productClickNumBo.getProductId())));
         }
         return productUserNum;
+    }
+
+    private List<ProductClickNumBo> getProductClickNum(){
+        return productClickLogMapper.getProductNum();
     }
 
     private List<Product> getProducts(ProductListClientForm productListClientForm) {
@@ -205,7 +215,7 @@ public class LoanProductService {
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
                     .id(product.getProductId())
-                    .jumpUrl(product.getJumpUrl() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()))
+                    .jumpUrl(product.getJumpUrl() + "&id=" + product.getId() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()))
                     .mark(product.getMark())
                     .name(product.getName())
                     .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
@@ -223,8 +233,8 @@ public class LoanProductService {
 
     private String formatClickNumStr(Integer num) {
         DecimalFormat df = new DecimalFormat("#.0");
-        if (null == num) {
-            return null;
+        if (null == num || 0 == num) {
+            return 0 + configs.getClickNumDesp();
         }
         String clickNum = num.toString();
         if (num > 10000) {
@@ -263,9 +273,14 @@ public class LoanProductService {
         return optionalInfo;
     }
 
-    public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
+    public void redirectUrl(HttpServletRequest request, HttpServletResponse response) {
         String uid = request.getParameter("p_u");
         String key = request.getParameter("key");
+        String jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
+        if(StringUtils.isEmpty(key) || StringUtils.isEmpty(jumpUrl)){
+            redirectLoanProductUrl(request, response);
+            return;
+        }
         UnionJumpBo jumpBo;
         if (StringUtils.isEmpty(uid)) {
             jumpBo = UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
@@ -282,7 +297,7 @@ public class LoanProductService {
         try {
             response.sendRedirect(jumpBo.getJumpUrl());
         } catch (IOException e) {
-            throw new CjjClientException(ErrorResponseConstants.UNION_LOGIN_FAILED_CODE, ErrorResponseConstants.UNION_LOGIN_FAILED_MSG);
+            throw new CjjClientException(ErrorResponseConstants.REDIRECT_FAILED_CODE, ErrorResponseConstants.REDIRECT_FAILED_MSG);
         }
     }
 
@@ -292,6 +307,47 @@ public class LoanProductService {
             return null;
         }
         return userInfo.getMobile();
+    }
+
+    private void redirectLoanProductUrl(HttpServletRequest request, HttpServletResponse response){
+        String uid = request.getParameter("p_u");
+        String id = request.getParameter("id");
+
+        taskExecutor.execute(new ClickTimeInc(uid, id));
+        try {
+            response.sendRedirect(getJumpUrl(Integer.valueOf(id)));
+        } catch (IOException e) {
+            throw new CjjClientException(ErrorResponseConstants.REDIRECT_FAILED_CODE, ErrorResponseConstants.REDIRECT_FAILED_MSG);
+        }
+
+    }
+
+    public class ClickTimeInc implements Runnable{
+
+        private String uid;
+
+        private String id;
+
+        public ClickTimeInc(String uid, String id){
+            this.uid = uid;
+            this.id = id;
+        }
+
+        @Override
+        public void run() {
+            ProductClickLog productClickLog = new ProductClickLog();
+            productClickLog.setUid(uid);
+            productClickLog.setProductId(Integer.valueOf(id));
+            productClickLogMapper.insertAndClickTimeIncre(productClickLog);
+        }
+    }
+
+    private String getJumpUrl(Integer id){
+        Product product = productMapper.selectByPrimaryKey(id);
+        if(product == null){
+            throw new CjjClientException(ErrorResponseConstants.PRODUCT_NOT_FOUND_CODE, ErrorResponseConstants.PRODUCT_NOT_FOUND_MSG);
+        }
+        return product.getJumpUrl();
     }
 
 }
