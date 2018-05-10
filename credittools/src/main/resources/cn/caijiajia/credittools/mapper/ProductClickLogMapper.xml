@@ -266,4 +266,55 @@
     where p.`status`="1"
     group by pcl.`product_id`
   </select>
+  <insert id="insertAndClickTimeIncre" parameterType="cn.caijiajia.credittools.domain.ProductClickLog" >
+    insert into `product_click_log`
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        `id`,
+      </if>
+      <if test="uid != null" >
+        `uid`,
+      </if>
+      <if test="productId != null" >
+        `product_id`,
+      </if>
+      <if test="name != null" >
+        `name`,
+      </if>
+      <if test="clickTime != null" >
+        `click_time`,
+      </if>
+      <if test="createdAt != null" >
+        `created_at`,
+      </if>
+      <if test="updatedAt != null" >
+        `updated_at`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uid != null" >
+        #{uid,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="clickTime != null" >
+        #{clickTime,jdbcType=INTEGER},
+      </if>
+      <if test="createdAt != null" >
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null" >
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+    on duplicate key
+    update click_time  = click_time + 1
+  </insert>
 </mapper>

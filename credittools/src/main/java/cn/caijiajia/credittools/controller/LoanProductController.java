@@ -48,7 +48,6 @@ public class LoanProductController {
         return loanProductService.getProductListClient(productListClientReq);
     }
 
-
     /**
      * 贷款产品联合登陆
      *
@@ -57,6 +56,6 @@ public class LoanProductController {
      */
     @RequestMapping(value = "/union/login", method = RequestMethod.GET)
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
-        loanProductService.unionLogin(request, response);
+        loanProductService.redirectUrl(request, response);
     }
 }
