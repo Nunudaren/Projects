@@ -10,17 +10,11 @@
 package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.form.RankForm;
-import cn.caijiajia.credittools.service.LoanProductService;
-import org.apache.commons.lang3.StringUtils;
+import cn.caijiajia.credittools.service.LoanProductMgrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by liujianyang on 2018/4/25.
@@ -29,7 +23,7 @@ import java.util.List;
 public class LocalTestController {
 
     @Autowired
-    private LoanProductService loanProductService;
+    private LoanProductMgrService loanProductMgrService;
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public void test(){
@@ -43,7 +37,7 @@ public class LocalTestController {
                 .currentRank(3)
                 .changedRank(5)
                 .build();
-        loanProductService.upateRankByProductId(rankForm);
+        loanProductMgrService.upateRankByProductId(rankForm);
     }
 
 
