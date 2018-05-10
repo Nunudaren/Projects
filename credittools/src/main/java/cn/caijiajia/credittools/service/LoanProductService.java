@@ -88,7 +88,6 @@ public class LoanProductService {
 
     @Autowired
     private UnionLoginLogService unionLoginLogService;
-
     private ProductClickLogMapper productClickLogMapper;
 
     @Autowired
