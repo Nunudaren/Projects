@@ -19,6 +19,10 @@
 		<module>credittools-common</module>
 	</modules>
 
+	<properties>
+		<rabbitmq.release.version>1.0.1-SNAPSHOT</rabbitmq.release.version>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -98,7 +102,7 @@
 			<dependency>
 				<groupId>cn.caijiajia</groupId>
 				<artifactId>rabbitmq-client</artifactId>
-				<version>${project.release.version}</version>
+				<version>${rabbitmq.release.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -308,5 +312,16 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+
+	<profiles>
+		<profile>
+			<id>pro</id>
+			<properties>
+				<rabbitmq.release.version>1.0.1.RELEASE</rabbitmq.release.version>
+			</properties>
+		</profile>
+	</profiles>
+
 
 </project>
