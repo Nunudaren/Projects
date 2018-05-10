@@ -46,6 +46,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -87,13 +88,15 @@ public class LoanProductService {
     private UserDelegator userDelegator;
 
     @Autowired
-    private UnionLoginLogService unionLoginLogService;
-
     private ProductClickLogMapper productClickLogMapper;
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
 
+    @Value("${url.credittools}")
+    private String credittoolsUrl;
+
+    public static final String REDIRECT_URL = "/redirectUrl";
 
     public LoanProductFilterVo getLoanProductFilter() {
         LoanProductFilterVo rtnVo = new LoanProductFilterVo();
@@ -223,7 +226,7 @@ public class LoanProductService {
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
                     .id(product.getProductId())
-                    .jumpUrl(product.getJumpUrl() + "&id=" + product.getId() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()))
+                    .jumpUrl( credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()))
                     .mark(product.getMark())
                     .name(product.getName())
                     .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
@@ -281,14 +284,9 @@ public class LoanProductService {
         return optionalInfo;
     }
 
-    public void redirectUrl(HttpServletRequest request, HttpServletResponse response) {
+    public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
         String uid = request.getParameter("p_u");
         String key = request.getParameter("key");
-        String jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
-        if(StringUtils.isEmpty(key) || StringUtils.isEmpty(jumpUrl)){
-            redirectLoanProductUrl(request, response);
-            return;
-        }
         UnionJumpBo jumpBo;
         if (StringUtils.isEmpty(uid)) {
             jumpBo = UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
@@ -340,17 +338,19 @@ public class LoanProductService {
                 .msg("").build();
     }
 
-    private void redirectLoanProductUrl(HttpServletRequest request, HttpServletResponse response){
+    public void redirectLoanProductUrl(HttpServletRequest request, HttpServletResponse response){
         String uid = request.getParameter("p_u");
+        if(StringUtils.isEmpty(uid)){
+            uid = "not login user";
+        }
         String id = request.getParameter("id");
 
         taskExecutor.execute(new ClickTimeInc(uid, id));
         try {
-            response.sendRedirect(getJumpUrl(Integer.valueOf(id)));
+            response.sendRedirect(getJumpUrl(Integer.valueOf(id), request.getParameter("p_u")));
         } catch (IOException e) {
             throw new CjjClientException(ErrorResponseConstants.REDIRECT_FAILED_CODE, ErrorResponseConstants.REDIRECT_FAILED_MSG);
         }
-
     }
 
     public class ClickTimeInc implements Runnable{
@@ -373,10 +373,13 @@ public class LoanProductService {
         }
     }
 
-    private String getJumpUrl(Integer id){
+    private String getJumpUrl(Integer id, String uid){
         Product product = productMapper.selectByPrimaryKey(id);
         if(product == null){
             throw new CjjClientException(ErrorResponseConstants.PRODUCT_NOT_FOUND_CODE, ErrorResponseConstants.PRODUCT_NOT_FOUND_MSG);
+        }
+        if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
+            return  product.getJumpUrl() + "&p_u=" + uid;
         }
         return product.getJumpUrl();
     }
