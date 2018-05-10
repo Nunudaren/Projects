@@ -51,4 +51,7 @@ public class Configs {
 
     @ConfElement(name = "credittools_click_num_desp")
     private String clickNumDesp;
+
+    @ConfElement(name = "credittools_union_login_products")
+    private List<String> unionLoginProducts;
 }

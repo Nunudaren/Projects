@@ -56,6 +56,15 @@ public class LoanProductController {
      */
     @RequestMapping(value = "/union/login", method = RequestMethod.GET)
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
-        loanProductService.redirectUrl(request, response);
+        loanProductService.unionLogin(request, response);
     }
+
+    /**
+     * 跳转外部指定贷款产品并记录次数
+     */
+    @RequestMapping(value = "/redirectUrl", method = RequestMethod.GET)
+    public void redirectUrl(HttpServletRequest request, HttpServletResponse response){
+        loanProductService.redirectLoanProductUrl(request, response);
+    }
+
 }
