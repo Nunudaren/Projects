@@ -38,6 +38,8 @@ public class ProductClientVo {
 
     private String jumpUrl;
 
+    private String clickNum;
+
     private List<OptionalInfo> optionalInfo;
 
     @Data
