@@ -1,5 +1,7 @@
 package cn.caijiajia.credittools.controller;
 
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserResp;
 import cn.caijiajia.credittools.form.*;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
@@ -108,6 +110,11 @@ public class LoanProductController {
     @RequestMapping(value = "/union/login", method = RequestMethod.GET)
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
         loanProductService.unionLogin(request, response);
+    }
+
+    @RequestMapping(value = "/lottery9188/checkUser", method = RequestMethod.POST)
+    public Lattery9188CheckUserResp checkUser(@RequestBody Lattery9188CheckUserReq lattery9188CheckUserReq){
+        return loanProductService.checkUser(lattery9188CheckUserReq);
     }
 
 }

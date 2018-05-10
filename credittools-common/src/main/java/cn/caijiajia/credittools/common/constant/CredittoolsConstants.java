@@ -11,4 +11,17 @@ public class CredittoolsConstants {
 
     public static final String ALL_STATUS = "all";
 
+    /**
+     * 9188彩票验证用户在还呗是否已登录
+     * 已登录
+     */
+    public static final String LOTTERY9188_CHECKUSER_LOGIN = "0000";
+
+    /**
+     * 未登录
+     */
+    public static final String LOTTERY9188_CHECKUSER_UNLOGIN = "1111";
+
+    public static final String LOTTERY9188_CHECKUSER_UNLOGIN_MSG = "用户未登录";
+
 }

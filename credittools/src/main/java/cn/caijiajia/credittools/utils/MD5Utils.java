@@ -5,6 +5,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * @Author:chendongdong
@@ -132,5 +133,100 @@ public class MD5Utils {
             var1.printStackTrace();
         }
 
+    }
+
+
+    public static void main(String[] args) {
+        Map<String, String> signMap = new HashMap<>();
+        signMap.put("partner", "1");
+        signMap.put("_input_charset", "UTF-8");
+        signMap.put("time_key", System.currentTimeMillis() + "");
+        signMap.put("notify_id", "notify_id");
+        signMap.put("user_id", "user_id");
+        signMap.put("mobileNo", "110");
+        signMap.put("target_url", "www.google.com");
+        signMap.put("realName", "彩亿");
+        signMap.put("certNo", "201805");
+        String signKey = "9188vlsppmh";
+        String dataString = getFormDataParamMD5(signMap);
+        System.out.println(sign(dataString, signKey, "UTF-8"));
+    }
+
+    public static String getFormDataParamMD5(Map<String, String> dataMap) {
+        if (dataMap == null) return null;
+
+        Set<String> keySet = dataMap.keySet();
+        List<String> keyList = new ArrayList<String>(keySet);
+        Collections.sort(keyList);
+
+        StringBuilder builder = new StringBuilder();
+        for (String key : keyList) {
+            String value = dataMap.get(key);
+
+            if (value != null && value.length() > 0) {
+                // 最后一个元素
+                if (key.equals(keyList.get(keyList.size() - 1))) {
+                    builder.append(key + "=" + value);
+                }else {
+                    builder.append(key + "=" + value + "&");
+                }
+            }
+        }
+        return builder.toString();
+    }
+
+    public static String sign(String text, String key, String charset) {
+        String message = text + key;
+
+        MessageDigest digest = getDigest("MD5");
+        digest.update(getContentBytes(message, charset));
+
+        byte[] signed = digest.digest();
+
+        return toHexString(signed);
+    }
+
+    public static byte[] getContentBytes(String content, String charset) {
+        if (charset == null || "".equals(charset)) {
+            return content.getBytes();
+        }
+        try {
+            return content.getBytes(charset);
+        } catch (UnsupportedEncodingException ex) {
+            throw new IllegalArgumentException("Not support:" + charset, ex);
+        }
+    }
+
+    private static MessageDigest getDigest(String algorithm) {
+        try {
+            return MessageDigest.getInstance(algorithm);
+        } catch (final NoSuchAlgorithmException ex) {
+            throw new IllegalArgumentException("Not support:" + algorithm, ex);
+        }
+    }
+
+    public static String toHexString(byte[] value) {
+        if (value == null) {
+            return null;
+        }
+
+        StringBuffer sb = new StringBuffer(value.length * 2);
+        for (int i = 0; i < value.length; i++) {
+            sb.append(toHexString(value[i]));
+        }
+        return sb.toString();
+    }
+
+    public static String toHexString(byte value) {
+        String hex = Integer.toHexString(value & 0xFF);
+
+        return padZero(hex, 2);
+    }
+
+    private static String padZero(String hex, int length) {
+        for (int i = hex.length(); i < length; i++) {
+            hex = "0" + hex;
+        }
+        return hex.toUpperCase();
     }
 }

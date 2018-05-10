@@ -29,6 +29,9 @@ public class ProductsFactory {
             case "youyu" :
                 clz = YouyuUnionLoginService.class;
                 break;
+            case "9188" :
+                clz = Lottery9188UnionLoginService.class;
+                break;
         }
         return (T)ContextLoader.getCurrentWebApplicationContext().getBean(clz);
     }

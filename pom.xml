@@ -144,12 +144,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.11</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
 				<groupId>cn.caijiajia</groupId>
 				<artifactId>db-util</artifactId>
 				<version>${project.release.version}</version>
@@ -306,6 +300,11 @@
 				<groupId>cn.caijiajia</groupId>
 				<artifactId>securityservice-common</artifactId>
 				<version>${project.release.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>4.1.7.RELEASE</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

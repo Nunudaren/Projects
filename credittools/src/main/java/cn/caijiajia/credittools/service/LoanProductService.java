@@ -6,9 +6,12 @@ import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserResp;
 import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.constant.ProductSortEnum;
+import cn.caijiajia.credittools.delegator.UserDelegator;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductExample;
 import cn.caijiajia.credittools.form.*;
@@ -72,6 +75,9 @@ public class LoanProductService {
 
     @Autowired
     private ProductsFactory productsFactory;
+
+    @Autowired
+    private UserDelegator userDelegator;
 
     @Autowired
     private UnionLoginLogService unionLoginLogService;
@@ -507,6 +513,29 @@ public class LoanProductService {
             return null;
         }
         return userInfo.getMobile();
+    }
+
+    public Lattery9188CheckUserResp checkUser(Lattery9188CheckUserReq req){
+        if (req == null || StringUtils.isBlank(req.getUser_id()))
+            return Lattery9188CheckUserResp.builder()
+                    .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN)
+                    .msg(ErrorResponseConstants.LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG).build();
+        UserVo userVo = userRpc.getUserInfo(req.getUser_id());
+        if (userVo == null)
+            return Lattery9188CheckUserResp.builder()
+                    .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN)
+                    .msg(ErrorResponseConstants.LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG).build();
+
+//        try{
+//            userDelegator.verifySession(req.getUser_id(), sessionId);
+//        }catch (Exception e) {
+//            return Lattery9188CheckUserResp.builder()
+//                    .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN)
+//                    .msg(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN_MSG).build();
+//        }
+        return Lattery9188CheckUserResp.builder()
+                .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_LOGIN)
+                .msg("").build();
     }
 
 }
