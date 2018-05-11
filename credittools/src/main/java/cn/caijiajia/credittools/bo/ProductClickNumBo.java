@@ -7,23 +7,21 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.credittools.form;
+package cn.caijiajia.credittools.bo;
 
-import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by liujianyang on 2018/5/3.
+ * Created by liujianyang on 2018/5/9.
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductListClientForm {
-    private ProductFilterTypeEnum filterType;
-    private String filterValue;
-    private String sortValue;
+public class ProductClickNumBo {
+    private String  productId;
+    private Integer clickNum;
 }

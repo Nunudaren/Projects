@@ -7,14 +7,13 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.credittools.vo;
+package cn.caijiajia.credittools.common.req;
 
+import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * Created by liujianyang on 2018/5/3.
@@ -23,29 +22,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductClientVo {
-    private String id;
-
-    private String name;
-
-    private String iconUrl;
-
-    private String mark;
-
-    private String feeRate;
-
-    private String promotion;
-
-    private String jumpUrl;
-
-    private List<OptionalInfo> optionalInfo;
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OptionalInfo{
-        private String type;
-        private String value;
-    }
+public class ProductListClientReq {
+    private ProductFilterTypeEnum filterType;
+    private String filterValue;
+    private String sortValue;
 }

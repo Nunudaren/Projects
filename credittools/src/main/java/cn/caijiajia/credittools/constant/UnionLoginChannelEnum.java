@@ -1,5 +1,5 @@
 package cn.caijiajia.credittools.constant;
 
 public enum UnionLoginChannelEnum {
-    YOUYU,QIHU360,PENGYUAN
+    YOUYU,QIHU360,PENGYUAN,LOTTERY9188
 }

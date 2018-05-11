@@ -36,7 +36,7 @@ public class PengyuanService implements IProductsService {
     @Autowired
     private PyBuildReqUrlService pyBuildReqUrlService;
     @Autowired
-    private LoanProductService loanProductService;
+    private LoanProductMgrService loanProductMgrService;
     @Autowired
     private UserDelegator userDelegator;
     @Autowired
@@ -45,12 +45,12 @@ public class PengyuanService implements IProductsService {
     @Override
     public UnionJumpBo unionLogin(String uid, String key) {
 
-        String jumpUrl = loanProductService.getUnionLoginUrl(key);
+        String jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
         String hostUrl = configs.getExternalUrl();
         PengyuanLoginReq pengyuanLoginReq = new PengyuanLoginReq();
         PengyuanLoginReq.ExtendInfo extendInfo = new PengyuanLoginReq.ExtendInfo();
         try {
-            jumpUrl = loanProductService.getUnionLoginUrl(key);
+            jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
             String photoUrl = null;
             UserInfo userInfo = userDelegator.getUser(uid);
 

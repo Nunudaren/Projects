@@ -1,6 +1,6 @@
 package cn.caijiajia.credittools.bo;
 
-import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
+import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

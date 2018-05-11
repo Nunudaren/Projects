@@ -13,19 +13,15 @@ import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.common.req.UnionLoginReq;
 import cn.caijiajia.credittools.common.resp.QihuResp;
-import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
 import cn.caijiajia.credittools.delegator.QihuDelegate;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.user.common.resp.UserVo;
 import cn.caijiajia.user.rpc.UserRpc;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 /**
  * Created by liujianyang on 2018/4/24.
@@ -41,14 +37,14 @@ public class QihuService implements IProductsService {
     private UserRpc userRpc;
 
     @Autowired
-    private LoanProductService loanProductService;
+    private LoanProductMgrService loanProductMgrService;
 
     private static final String METHOD = "user.unionlogin";
 
     @Override
     public UnionJumpBo unionLogin(String uid, String key) {
         String mobile = getMobile(uid);
-        UnionJumpBo jumpBo = UnionJumpBo.builder().jumpUrl(loanProductService.getUnionLoginUrl(key)).build();
+        UnionJumpBo jumpBo = UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
         UnionLoginReq unionLoginReq = UnionLoginReq.builder().mobile(mobile).build();
         QihuResp qihuResp = qihuDelegate.invoke(unionLoginReq, METHOD);
         if (qihuResp.getCode() == 200) {

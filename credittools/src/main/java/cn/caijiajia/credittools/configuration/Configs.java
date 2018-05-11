@@ -48,7 +48,13 @@ public class Configs {
 
     @ConfElement(name = "credittools_external_url")
     private String externalUrl;
+    @ConfElement(name = "credittools_click_num_switch")
+    private Integer clickNumSwitch; // 0：关闭 1：打开
 
-    @ConfElement(name = "credittools_union_login_products")
-    private List<String> unionLoginProducts;
+    @ConfElement(name = "credittools_product_click_num")
+    private Map<String, Integer> productClickNum;
+
+    @ConfElement(name = "credittools_click_num_desp")
+    private String clickNumDesp;
+
 }
