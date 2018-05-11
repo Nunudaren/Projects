@@ -315,20 +315,15 @@ public class LoanProductService {
         return userInfo.getMobile();
     }
 
-    public Lattery9188CheckUserResp checkUser(Lattery9188CheckUserReq req) {
+    public String checkUser(Lattery9188CheckUserReq req) {
         if (req == null || StringUtils.isBlank(req.getUser_id()))
-            return Lattery9188CheckUserResp.builder()
-                    .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN)
-                    .msg(ErrorResponseConstants.LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG).build();
+            return CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN;
+
         UserVo userVo = userRpc.getUserInfo(req.getUser_id());
         if (userVo == null)
-            return Lattery9188CheckUserResp.builder()
-                    .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN)
-                    .msg(ErrorResponseConstants.LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG).build();
+            return CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN;
 
-        return Lattery9188CheckUserResp.builder()
-                .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_LOGIN)
-                .msg("").build();
+        return CredittoolsConstants.LOTTERY9188_CHECKUSER_LOGIN;
     }
 
     public void redirectLoanProductUrl(HttpServletRequest request, HttpServletResponse response){

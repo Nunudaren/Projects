@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by liujianyang on 2018/5/9.
@@ -63,8 +64,9 @@ public class LoanProductController {
     }
 
     @RequestMapping(value = "/lottery9188/checkUser", method = RequestMethod.POST)
-    public Lattery9188CheckUserResp checkUser(Lattery9188CheckUserReq lattery9188CheckUserReq) {
-        return loanProductService.checkUser(lattery9188CheckUserReq);
+    public void checkUser(Lattery9188CheckUserReq lattery9188CheckUserReq,HttpServletResponse response) throws IOException {
+        String checkUser = loanProductService.checkUser(lattery9188CheckUserReq);
+        response.getWriter().write(checkUser);
     }
 
     /**
