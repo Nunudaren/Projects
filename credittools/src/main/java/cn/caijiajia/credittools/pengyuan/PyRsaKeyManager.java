@@ -18,7 +18,7 @@ import java.util.Map;
 public class PyRsaKeyManager implements RsaKeyManager {
 
     /**
-     * 鹏元RSA公钥
+     * 鹏元RSA公钥(加密AES随机密钥)
      */
     private String pyPublicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDJc7ZOsBJlfb6/etCf2Md2sqddjtw/XuQMOXE2B5O4sBFCjka5i/nkBDRcibZoH1wHJIyXne+OH5D0pA6Bga1K91P3em2QPi+2lh0gMaz3JxMnO3etxj3by9KrezK915Ls1h6ahaQkXRCbga4UcSTtF88zounnqe1bXYazrrEtmQIDAQAB";
 
