@@ -1,4 +1,4 @@
-package cn.caijiajia.credittools.service;
+package cn.caijiajia.credittools.service.pengyuan;
 
 import cn.caijiajia.creditdata.common.resp.FaceVerifyDataResp;
 import cn.caijiajia.creditdata.common.resp.PhotoSupplierDataResp;
@@ -9,14 +9,15 @@ import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.common.req.PengyuanLoginReq;
 import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
-import cn.caijiajia.credittools.pengyuan.PyBuildReqUrlService;
+import cn.caijiajia.credittools.service.IProductsService;
+import cn.caijiajia.credittools.service.LoanProductMgrService;
+import cn.caijiajia.credittools.service.pengyuan.PyBuildReqUrlService;
 import cn.caijiajia.credittools.delegator.UserDelegator;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.utils.crypto.Base64Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Maps;
-import org.assertj.core.util.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

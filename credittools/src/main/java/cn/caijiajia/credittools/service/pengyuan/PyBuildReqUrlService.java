@@ -1,8 +1,8 @@
-package cn.caijiajia.credittools.pengyuan;
+package cn.caijiajia.credittools.service.pengyuan;
 
-import cn.caijiajia.credittools.pengyuan.core.OpenApiClient;
-import cn.caijiajia.credittools.pengyuan.core.OpenApiConfig;
-import cn.caijiajia.credittools.pengyuan.exception.OpenApiException;
+import cn.caijiajia.credittools.service.pengyuan.core.OpenApiClient;
+import cn.caijiajia.credittools.service.pengyuan.core.OpenApiConfig;
+import cn.caijiajia.credittools.service.pengyuan.exception.OpenApiException;
 import cn.caijiajia.framework.httpclient.HttpClientTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

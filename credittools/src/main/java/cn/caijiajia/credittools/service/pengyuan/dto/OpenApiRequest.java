@@ -1,4 +1,4 @@
-package cn.caijiajia.credittools.pengyuan.dto;
+package cn.caijiajia.credittools.service.pengyuan.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

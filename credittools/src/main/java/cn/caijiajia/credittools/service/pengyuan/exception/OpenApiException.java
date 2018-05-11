@@ -1,4 +1,4 @@
-package cn.caijiajia.credittools.pengyuan.exception;
+package cn.caijiajia.credittools.service.pengyuan.exception;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package cn.caijiajia.credittools.pengyuan.util;
+package cn.caijiajia.credittools.service.pengyuan.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
