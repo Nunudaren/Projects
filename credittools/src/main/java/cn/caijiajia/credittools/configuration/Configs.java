@@ -48,7 +48,4 @@ public class Configs {
 
     @ConfElement(name = "credittools_external_url")
     private String externalUrl;
-
-    @ConfElement(name = "credittools_union_login_products")
-    private List<String> unionLoginProducts;
 }
