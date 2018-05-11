@@ -56,5 +56,4 @@ public class Configs {
 
     @ConfElement(name = "credittools_click_num_desp")
     private String clickNumDesp;
-
 }
