@@ -23,7 +23,7 @@ public class Lottery9188Test {
 
     @Test
     public void test(){
-        lottery9188UnionLoginService.unionLogin("111","");
+        lottery9188UnionLoginService.unionLogin("007064d1-1a4d-4445-8bd5-affc366f6d65","");
     }
 
 }

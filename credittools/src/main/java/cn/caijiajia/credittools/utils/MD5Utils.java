@@ -137,19 +137,21 @@ public class MD5Utils {
 
 
     public static void main(String[] args) {
+        System.out.println(System.currentTimeMillis());
+        String signKey = "rf746b6cNLdmCEF6Mf5RCrYubsygqu";
         Map<String, String> signMap = new HashMap<>();
-        signMap.put("partner", "1");
+        signMap.put("partner", "19");
         signMap.put("_input_charset", "UTF-8");
-        signMap.put("time_key", System.currentTimeMillis() + "");
+        signMap.put("time_key","1526006751198");
         signMap.put("notify_id", "notify_id");
         signMap.put("user_id", "user_id");
         signMap.put("mobileNo", "110");
         signMap.put("target_url", "www.google.com");
-        signMap.put("realName", "彩亿");
+        signMap.put("realName", "caiyi");
         signMap.put("certNo", "201805");
-        String signKey = "9188vlsppmh";
         String dataString = getFormDataParamMD5(signMap);
-        System.out.println(sign(dataString, signKey, "UTF-8"));
+        System.out.println("这些参数是要在链接里传的:"+dataString);
+        System.out.println("加密结果"+sign(dataString, signKey, "UTF-8"));
     }
 
     public static String getFormDataParamMD5(Map<String, String> dataMap) {
@@ -164,20 +166,15 @@ public class MD5Utils {
             String value = dataMap.get(key);
 
             if (value != null && value.length() > 0) {
-                // 最后一个元素
-                if (key.equals(keyList.get(keyList.size() - 1))) {
-                    builder.append(key + "=" + value);
-                }else {
-                    builder.append(key + "=" + value + "&");
-                }
+                builder.append(key + "=" + value + "&");
             }
         }
+        builder.setLength(builder.length()-1);
         return builder.toString();
     }
 
     public static String sign(String text, String key, String charset) {
         String message = text + key;
-
         MessageDigest digest = getDigest("MD5");
         digest.update(getContentBytes(message, charset));
 

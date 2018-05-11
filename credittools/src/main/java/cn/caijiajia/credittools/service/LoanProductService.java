@@ -326,13 +326,6 @@ public class LoanProductService {
                     .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN)
                     .msg(ErrorResponseConstants.LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG).build();
 
-//        try{
-//            userDelegator.verifySession(req.getUser_id(), sessionId);
-//        }catch (Exception e) {
-//            return Lattery9188CheckUserResp.builder()
-//                    .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN)
-//                    .msg(CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN_MSG).build();
-//        }
         return Lattery9188CheckUserResp.builder()
                 .code(CredittoolsConstants.LOTTERY9188_CHECKUSER_LOGIN)
                 .msg("").build();

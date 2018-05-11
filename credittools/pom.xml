@@ -295,5 +295,11 @@
             <version>4.12</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.9</version>
+        </dependency>
+
     </dependencies>
 </project>

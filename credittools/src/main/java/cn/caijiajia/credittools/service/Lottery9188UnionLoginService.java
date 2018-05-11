@@ -12,6 +12,7 @@ import cn.caijiajia.framework.httpclient.HttpClientTemplate;
 import cn.caijiajia.user.common.resp.UserVo;
 import cn.caijiajia.user.rpc.UserRpc;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.amazonaws.util.Md5Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ import java.util.Map;
 @Slf4j
 public class Lottery9188UnionLoginService implements IProductsService {
     @Autowired
-    private LoanProductService loanProductService;
+    private LoanProductMgrService loanProductMgrService;
     @Autowired
     private HttpClientTemplate httpClientTemplate;
 
@@ -46,27 +47,23 @@ public class Lottery9188UnionLoginService implements IProductsService {
 
     @Override
     public UnionJumpBo unionLogin(String uid, String key) {
-//        String jumpUrl = loanProductService.getUnionLoginUrl(key);
+        String jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
 
         Map<String, String> signMap = Maps.newHashMap();
         signMap.put("time_key", System.currentTimeMillis() + 3 * 60 * 60 * 1000 + "");
         signMap.put("user_id", uid);
+        signMap.put("partner", partner);
+        signMap.put("_input_charset", _INPUT_CHARSET);
+
         String signStr = MD5Utils.getFormDataParamMD5(signMap);
         String sign = MD5Utils.sign(signStr, lottery9188MD5Key, _INPUT_CHARSET);
 
-        Map<String, String> reqParam = Maps.newHashMap();
-        reqParam.put("sign", sign);
-        reqParam.put("charset", _INPUT_CHARSET);
-        reqParam.put("sign_type", SIGN_TYPE);
-        reqParam.put("partner", partner);
-        reqParam.put("paramData", JSON.toJSONString(signMap));
-
-        String reqStr = MD5Utils.getFormDataParamMD5(reqParam);
-        reqStr = reqStr + "&" + lottery9188MD5Key;
-        String result = httpClientTemplate.doPost(lottery9188Url, reqStr);
+        StringBuilder reqStr = new StringBuilder();
+        reqStr.append(signStr).append("&sign=").append(sign).append("&sign_type=").append(SIGN_TYPE);
+        String result = httpClientTemplate.doPost(lottery9188Url + "?" + reqStr,new JSONObject());
         System.out.println(result);
 
-        return null;
+        return UnionJumpBo.builder().jumpUrl(jumpUrl).build();
     }
 
     @Override
