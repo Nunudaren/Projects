@@ -63,7 +63,7 @@ public class LoanProductController {
     }
 
     @RequestMapping(value = "/lottery9188/checkUser", method = RequestMethod.POST)
-    public Lattery9188CheckUserResp checkUser(@RequestBody Lattery9188CheckUserReq lattery9188CheckUserReq) {
+    public Lattery9188CheckUserResp checkUser(Lattery9188CheckUserReq lattery9188CheckUserReq) {
         return loanProductService.checkUser(lattery9188CheckUserReq);
     }
 

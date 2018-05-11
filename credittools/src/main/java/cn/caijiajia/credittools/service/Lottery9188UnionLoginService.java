@@ -1,20 +1,9 @@
 package cn.caijiajia.credittools.service;
 
-import cn.caijiajia.card.common.resp.CardVo;
-import cn.caijiajia.card.rpc.CardRpc;
 import cn.caijiajia.credittools.bo.UnionJumpBo;
-import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
-import cn.caijiajia.credittools.utils.CommonUtil;
 import cn.caijiajia.credittools.utils.MD5Utils;
-import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.httpclient.HttpClientTemplate;
-import cn.caijiajia.user.common.resp.UserVo;
-import cn.caijiajia.user.rpc.UserRpc;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-import com.amazonaws.util.Md5Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.util.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +22,6 @@ import java.util.Map;
 public class Lottery9188UnionLoginService implements IProductsService {
     @Autowired
     private LoanProductMgrService loanProductMgrService;
-    @Autowired
-    private HttpClientTemplate httpClientTemplate;
 
     private static final String SIGN_TYPE = "MD5";
     private static final String _INPUT_CHARSET = "UTF-8";
@@ -47,23 +34,26 @@ public class Lottery9188UnionLoginService implements IProductsService {
 
     @Override
     public UnionJumpBo unionLogin(String uid, String key) {
-        String jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
+        String url;
+        try {
+            Map<String, String> signMap = Maps.newHashMap();
+            signMap.put("time_key", System.currentTimeMillis() + 3 * 60 * 60 * 1000 + "");
+            signMap.put("user_id", uid);
+            signMap.put("partner", partner);
+            signMap.put("_input_charset", _INPUT_CHARSET);
 
-        Map<String, String> signMap = Maps.newHashMap();
-        signMap.put("time_key", System.currentTimeMillis() + 3 * 60 * 60 * 1000 + "");
-        signMap.put("user_id", uid);
-        signMap.put("partner", partner);
-        signMap.put("_input_charset", _INPUT_CHARSET);
+            String signStr = MD5Utils.getFormDataParamMD5(signMap);
+            String sign = MD5Utils.sign(signStr, lottery9188MD5Key, _INPUT_CHARSET);
 
-        String signStr = MD5Utils.getFormDataParamMD5(signMap);
-        String sign = MD5Utils.sign(signStr, lottery9188MD5Key, _INPUT_CHARSET);
+            StringBuilder reqStr = new StringBuilder();
+            reqStr.append(signStr).append("&sign=").append(sign).append("&sign_type=").append(SIGN_TYPE);
 
-        StringBuilder reqStr = new StringBuilder();
-        reqStr.append(signStr).append("&sign=").append(sign).append("&sign_type=").append(SIGN_TYPE);
-        String result = httpClientTemplate.doPost(lottery9188Url + "?" + reqStr,new JSONObject());
-        System.out.println(result);
-
-        return UnionJumpBo.builder().jumpUrl(jumpUrl).build();
+            url = lottery9188Url + "?" + reqStr;
+        }catch (Exception e) {
+            log.error("9188彩票联合登录异常：", e);
+            return UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
+        }
+        return UnionJumpBo.builder().jumpUrl(url).build();
     }
 
     @Override
