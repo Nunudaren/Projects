@@ -22,6 +22,4 @@ public class CredittoolsConstants {
      */
     public static final String LOTTERY9188_CHECKUSER_UNLOGIN = "1111";
 
-    public static final String LOTTERY9188_CHECKUSER_UNLOGIN_MSG = "用户未登录";
-
 }

@@ -49,6 +49,7 @@ public class Lottery9188UnionLoginService implements IProductsService {
             reqStr.append(signStr).append("&sign=").append(sign).append("&sign_type=").append(SIGN_TYPE);
 
             url = lottery9188Url + "?" + reqStr;
+            log.info("9188彩票联合登录请求url ：" + url);
         }catch (Exception e) {
             log.error("9188彩票联合登录异常：", e);
             return UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
