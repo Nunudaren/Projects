@@ -81,7 +81,6 @@ public class PengyuanService implements IProductsService {
                 extendInfo.setConfidence(Base64Utils.encodeBase64String(resp.getVerifyScore().getBytes()));
             }
 
-            //TODO set 阈值、公安比对照片
             extendInfo.setThresholdLevel("0.6");
             pengyuanLoginReq.setExtraField(extendInfo);
 

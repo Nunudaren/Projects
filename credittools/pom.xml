@@ -310,10 +310,5 @@
             <groupId>cn.caijiajia</groupId>
             <artifactId>securityservice-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>cn.caijiajia</groupId>
-            <artifactId>loanproduct</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 </project>
