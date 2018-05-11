@@ -122,6 +122,14 @@
         <constructor-arg value="${url.creditdata}"/>
     </bean>
 
+    <bean id="userUrl" class="java.lang.String">
+        <constructor-arg value="${url.user}"/>
+    </bean>
+
+    <bean id="userLoanUrl" class="java.lang.String">
+        <constructor-arg value="${url.userloan}"/>
+    </bean>
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
             <value>classpath:spring-config.properties</value>
