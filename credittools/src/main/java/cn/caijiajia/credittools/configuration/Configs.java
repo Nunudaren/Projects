@@ -42,4 +42,7 @@ public class Configs {
 
     @ConfElement(name = "loanproduct_loanproducts_filters")
     private LoanProductFilterVo loanProductFilters;
+
+    @ConfElement(name = "credittools_union_login_products")
+    private List<String> unionLoginProducts;
 }
