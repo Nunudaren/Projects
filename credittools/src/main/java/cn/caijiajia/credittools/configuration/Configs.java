@@ -54,4 +54,10 @@ public class Configs {
 
     @ConfElement(name = "credittools_union_login_products")
     private List<String> unionLoginProducts;
+
+    @ConfElement(name = "credittools_client_proxy_url")
+    private String credittoolsUrl;
+
+    @ConfElement(name = "credittools_default_out_of_time")
+    private Integer defaultOutOfTime;
 }
