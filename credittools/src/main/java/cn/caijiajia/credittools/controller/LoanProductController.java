@@ -9,17 +9,21 @@
  */
 package cn.caijiajia.credittools.controller;
 
-import cn.caijiajia.credittools.form.ProductListClientForm;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserResp;
+import cn.caijiajia.credittools.common.req.ProductListClientReq;
+import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
-import cn.caijiajia.credittools.vo.ProductListClientVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by liujianyang on 2018/5/9.
@@ -44,8 +48,8 @@ public class LoanProductController {
      * 贷款产品聚合页，获取贷款产品列表
      */
     @RequestMapping(value = "/getLoanProductList", method = RequestMethod.GET)
-    public ProductListClientVo getLoanProductListClient(ProductListClientForm productListClientForm) {
-        return loanProductService.getProductListClient(productListClientForm);
+    public ProductListClientResp getLoanProductListClient(ProductListClientReq productListClientReq) {
+        return loanProductService.getProductListClient(productListClientReq);
     }
 
     /**
@@ -57,6 +61,12 @@ public class LoanProductController {
     @RequestMapping(value = "/union/login", method = RequestMethod.GET)
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
         loanProductService.unionLogin(request, response);
+    }
+
+    @RequestMapping(value = "/lottery9188/checkUser", method = RequestMethod.POST)
+    public void checkUser(Lattery9188CheckUserReq lattery9188CheckUserReq,HttpServletResponse response) throws IOException {
+        String checkUser = loanProductService.checkUser(lattery9188CheckUserReq);
+        response.getWriter().write(checkUser);
     }
 
     /**

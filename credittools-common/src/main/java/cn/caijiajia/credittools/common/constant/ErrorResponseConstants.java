@@ -48,4 +48,6 @@ public class ErrorResponseConstants {
     public static final String GET_USER_CLICK_NUM_FAILED_MSG = "获取申请人数失败";
 
 
+    public static final String LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG = "参数错误：user_id为空或不存在";
+
 }

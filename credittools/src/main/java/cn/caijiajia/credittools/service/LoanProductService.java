@@ -15,20 +15,23 @@ import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserResp;
+import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
+import cn.caijiajia.credittools.common.req.ProductListClientReq;
+import cn.caijiajia.credittools.common.resp.ProductClientResp;
+import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.configuration.Configs;
-import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.constant.ProductSortEnum;
+import cn.caijiajia.credittools.delegator.UserDelegator;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductClickLog;
 import cn.caijiajia.credittools.domain.ProductClickLogExample;
 import cn.caijiajia.credittools.domain.ProductExample;
-import cn.caijiajia.credittools.form.ProductListClientForm;
 import cn.caijiajia.credittools.mapper.ProductClickLogMapper;
 import cn.caijiajia.credittools.mapper.ProductMapper;
 import cn.caijiajia.credittools.utils.MoneyUtil;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
-import cn.caijiajia.credittools.vo.ProductClientVo;
-import cn.caijiajia.credittools.vo.ProductListClientVo;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.threadlocal.ParameterThreadLocal;
 import cn.caijiajia.loanproduct.common.Resp.LoanProductResp;
@@ -80,6 +83,9 @@ public class LoanProductService {
 
     @Autowired
     private LoanProductMgrService loanProductMgrService;
+
+    @Autowired
+    private UserDelegator userDelegator;
 
     @Autowired
     private ProductClickLogMapper productClickLogMapper;
@@ -150,12 +156,12 @@ public class LoanProductService {
         if (null != configs.getGuideWords()) {
             guideWords = configs.getGuideWords();
         }
-        List<ProductClientVo> rtnVo = Lists.newArrayList();
+        List<ProductClientResp> rtnVo = Lists.newArrayList();
         if (CollectionUtils.isNotEmpty(products)) {
             Map<String, Integer> clickNumMap = getClickNumMap();
             rtnVo = transform(products, clickNumMap);
         }
-        return ProductListClientVo.builder()
+        return ProductListClientResp.builder()
                 .loanProductList(rtnVo)
                 .guideWords(guideWords)
                 .build();
@@ -231,27 +237,27 @@ public class LoanProductService {
         }
         if (StringUtils.isEmpty(productListClientForm.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientForm.getSortValue())) {
             productExample.setOrderByClause("rank asc");
-        } else if (ProductSortEnum.LEND_FAST.getValue().equals(productListClientForm.getSortValue())) {
+        } else if (ProductSortEnum.LEND_FAST.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("lend_time asc");
-        } else if (ProductSortEnum.FEE_RATE_LOW.getValue().equals(productListClientForm.getSortValue())) {
+        } else if (ProductSortEnum.FEE_RATE_LOW.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("annual_rate asc");
-        } else if (ProductSortEnum.PASS_RATE_HIGH.getValue().equals(productListClientForm.getSortValue())) {
+        } else if (ProductSortEnum.PASS_RATE_HIGH.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("pass_rate desc");
         }
-        if (null == productListClientForm.getFilterType() || StringUtils.isEmpty(productListClientForm.getFilterValue())) {
+        if (null == productListClientReq.getFilterType() || StringUtils.isEmpty(productListClientReq.getFilterValue())) {
             return productMapper.selectByExample(productExample);
         }
-        if (ProductFilterTypeEnum.LEND_AMOUNT == productListClientForm.getFilterType()) {
-            String[] filterAmount = StringUtils.split(productListClientForm.getFilterValue(), ",");
+        if (ProductFilterTypeEnum.LEND_AMOUNT == productListClientReq.getFilterType()) {
+            String[] filterAmount = StringUtils.split(productListClientReq.getFilterValue(), ",");
             Integer filterMinAmount = Integer.parseInt(filterAmount[0]);
             Integer filterMaxAmount = Integer.parseInt(filterAmount[1]);
 
             criteria.andMinAmountLessThanOrEqualTo(filterMaxAmount).andMaxAmountGreaterThanOrEqualTo(filterMinAmount);
             return productMapper.selectByExample(productExample);
 
-        } else if (ProductFilterTypeEnum.PRODUCT_TAGS == productListClientForm.getFilterType()) {
+        } else if (ProductFilterTypeEnum.PRODUCT_TAGS == productListClientReq.getFilterType()) {
 
-            criteria.andTagsLike("%" + productListClientForm.getFilterValue() + "%");
+            criteria.andTagsLike("%" + productListClientReq.getFilterValue() + "%");
             return productMapper.selectByExample(productExample);
         }
 
@@ -277,7 +283,7 @@ public class LoanProductService {
         String credittoolsUrl = configs.getCredittoolsUrl();
         List<ProductClientVo> products = Lists.newArrayList();
         for (Product product : loanProducts) {
-            products.add(ProductClientVo.builder()
+            products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
                     .id(product.getProductId())
@@ -286,10 +292,10 @@ public class LoanProductService {
                     .name(product.getName())
                     .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
                     .promotion(product.getPromotion())
-                    .optionalInfo(Lists.newArrayList(Collections2.transform(buildOptionalInfo(product), new Function<LoanProductResp.OptionalInfo, ProductClientVo.OptionalInfo>() {
+                    .optionalInfo(Lists.newArrayList(Collections2.transform(buildOptionalInfo(product), new Function<LoanProductResp.OptionalInfo, ProductClientResp.OptionalInfo>() {
                         @Override
-                        public ProductClientVo.OptionalInfo apply(LoanProductResp.OptionalInfo input) {
-                            return ProductClientVo.OptionalInfo.builder().type(input.getType()).value(input.getValue()).build();
+                        public ProductClientResp.OptionalInfo apply(LoanProductResp.OptionalInfo input) {
+                            return ProductClientResp.OptionalInfo.builder().type(input.getType()).value(input.getValue()).build();
                         }
                     })))
                     .build());
@@ -368,6 +374,17 @@ public class LoanProductService {
             return null;
         }
         return userInfo.getMobile();
+    }
+
+    public String checkUser(Lattery9188CheckUserReq req) {
+        if (req == null || StringUtils.isBlank(req.getUser_id()))
+            return CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN;
+
+        UserVo userVo = userRpc.getUserInfo(req.getUser_id());
+        if (userVo == null)
+            return CredittoolsConstants.LOTTERY9188_CHECKUSER_UNLOGIN;
+
+        return CredittoolsConstants.LOTTERY9188_CHECKUSER_LOGIN;
     }
 
     public void redirectLoanProductUrl(HttpServletRequest request, HttpServletResponse response){

@@ -7,7 +7,7 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.credittools.vo;
+package cn.caijiajia.credittools.common.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +23,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductListClientVo {
+public class ProductListClientResp {
     private String guideWords;
-    private List<ProductClientVo> loanProductList;
+    private List<ProductClientResp> loanProductList;
 }
