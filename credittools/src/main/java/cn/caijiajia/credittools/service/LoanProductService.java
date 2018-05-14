@@ -95,8 +95,6 @@ public class LoanProductService {
 
     @Value("${url.credittools}")
     private String credittoolsUrl;
-    @Value("${lottery9188.unionLoginRedirect.url}")
-    private String redirectUrl;
 
     public static final String REDIRECT_URL = "/redirectUrl";
 
