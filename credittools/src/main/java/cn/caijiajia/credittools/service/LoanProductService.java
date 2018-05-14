@@ -15,9 +15,8 @@ import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
-import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
-import cn.caijiajia.credittools.common.req.Lattery9188CheckUserResp;
 import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
 import cn.caijiajia.credittools.common.req.ProductListClientReq;
 import cn.caijiajia.credittools.common.resp.ProductClientResp;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
@@ -49,7 +48,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -144,7 +142,7 @@ public class LoanProductService {
         return Lists.newArrayList(transform);
     }
 
-    public ProductListClientVo getProductListClient(ProductListClientForm productListClientForm) {
+    public ProductListClientResp getProductListClient(ProductListClientReq productListClientReq) {
         List<Integer> clickProductIds = Lists.newArrayList();
         //配置一定量的用户使用个性化推荐（默认20%）
         boolean isCustom = getCustomProp();
@@ -152,7 +150,7 @@ public class LoanProductService {
             clickProductIds = getClickProductIds();
         }
         String guideWords = null;
-        List<Product> products = getProducts(productListClientForm, clickProductIds);
+        List<Product> products = getProducts(productListClientReq, clickProductIds);
         if (null != configs.getGuideWords()) {
             guideWords = configs.getGuideWords();
         }
@@ -219,12 +217,12 @@ public class LoanProductService {
         return productClickLogMapper.getProductNum();
     }
 
-    private List<Product> getProducts(ProductListClientForm productListClientForm, List<Integer> clickProductIds) {
+    private List<Product> getProducts(ProductListClientReq productListClientReq, List<Integer> clickProductIds) {
         ProductExample productExample = new ProductExample();
         ProductExample.Criteria criteria = productExample.createCriteria();
         criteria.andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
         //默认排序并且没有筛选
-        if((StringUtils.isEmpty(productListClientForm.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientForm.getSortValue())) && (null == productListClientForm.getFilterType() || StringUtils.isEmpty(productListClientForm.getFilterValue()))){
+        if((StringUtils.isEmpty(productListClientReq.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientReq.getSortValue())) && (null == productListClientReq.getFilterType() || StringUtils.isEmpty(productListClientReq.getFilterValue()))){
             productExample.setOrderByClause("rank asc");
             List<Product> defaultProducts = productMapper.selectByExample(productExample);
             if(CollectionUtils.isNotEmpty(clickProductIds)){
@@ -235,7 +233,7 @@ public class LoanProductService {
             }
             return defaultProducts;
         }
-        if (StringUtils.isEmpty(productListClientForm.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientForm.getSortValue())) {
+        if (StringUtils.isEmpty(productListClientReq.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("rank asc");
         } else if (ProductSortEnum.LEND_FAST.getValue().equals(productListClientReq.getSortValue())) {
             productExample.setOrderByClause("lend_time asc");
@@ -279,9 +277,9 @@ public class LoanProductService {
         return productMapper.selectByExample(productExample);
     }
 
-    private List<ProductClientVo> transform(List<Product> loanProducts, Map<String, Integer> clickNum) {
+    private List<ProductClientResp> transform(List<Product> loanProducts, Map<String, Integer> clickNum) {
         String credittoolsUrl = configs.getCredittoolsUrl();
-        List<ProductClientVo> products = Lists.newArrayList();
+        List<ProductClientResp> products = Lists.newArrayList();
         for (Product product : loanProducts) {
             products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
