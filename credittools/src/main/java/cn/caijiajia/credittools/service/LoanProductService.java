@@ -168,6 +168,9 @@ public class LoanProductService {
     private boolean getCustomProp(){
         List<String> userRecommentProp = configs.getUserRecommentProp();
         String uid = ParameterThreadLocal.getUid();
+        if(StringUtils.isEmpty(uid)){
+            return false;
+        }
         String mobile = getMobileNoCheck(uid);
         if(StringUtils.isEmpty(mobile)){
             return false;
