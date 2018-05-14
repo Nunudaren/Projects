@@ -187,7 +187,7 @@ public class LoanProductService {
             return Lists.newArrayList();
         }
         ProductClickLogExample productClickLogExample = new ProductClickLogExample();
-        productClickLogExample.createCriteria().andUpdatedAtGreaterThanOrEqualTo(date).andUidEqualTo(uid);
+        productClickLogExample.createCriteria().andUpdatedAtLessThanOrEqualTo(date).andUidEqualTo(uid);
         productClickLogExample.setOrderByClause("updated_at asc");
         List<ProductClickLog> productClickLogs = productClickLogMapper.selectByExample(productClickLogExample);
         return Lists.newArrayList(Collections2.transform(productClickLogs, new Function<ProductClickLog, Integer>() {
