@@ -139,9 +139,12 @@ public class LoanProductService {
     }
 
     public ProductListClientVo getProductListClient(ProductListClientForm productListClientForm) {
-        Integer singleOutOfTime = configs.getDefaultOutOfTime();
-        Date date = new DateTime().minusHours(singleOutOfTime).toDate();
-        List<Integer> clickProductIds = getClickProductIds(date);
+        List<Integer> clickProductIds = Lists.newArrayList();
+        //配置一定量的用户使用个性化推荐（默认20%）
+        boolean isCustom = getCustomProp();
+        if(isCustom){
+            clickProductIds = getClickProductIds();
+        }
         String guideWords = null;
         List<Product> products = getProducts(productListClientForm, clickProductIds);
         if (null != configs.getGuideWords()) {
@@ -149,16 +152,29 @@ public class LoanProductService {
         }
         List<ProductClientVo> rtnVo = Lists.newArrayList();
         if (CollectionUtils.isNotEmpty(products)) {
-            Map<String, Integer> clickNum = getClickNum();
-            rtnVo = transform(products, clickNum);
-    }
+            Map<String, Integer> clickNumMap = getClickNumMap();
+            rtnVo = transform(products, clickNumMap);
+        }
         return ProductListClientVo.builder()
                 .loanProductList(rtnVo)
                 .guideWords(guideWords)
                 .build();
     }
 
-    private List<Integer> getClickProductIds(Date date){
+    private boolean getCustomProp(){
+        List<String> userRecommentProp = configs.getUserRecommentProp();
+        String uid = ParameterThreadLocal.getUid();
+        String mobile = getMobileNoCheck(uid);
+        if(StringUtils.isEmpty(mobile)){
+            return false;
+        }
+        String endOfMobile = mobile.substring(mobile.length() - 1, mobile.length());
+        return userRecommentProp.contains(endOfMobile);
+    }
+
+    private List<Integer> getClickProductIds(){
+        Integer singleOutOfTime = configs.getDefaultOutOfTime();
+        Date date = new DateTime().minusHours(singleOutOfTime).toDate();
         String uid = ParameterThreadLocal.getUid();
         if(StringUtils.isEmpty(uid)){
             return Lists.newArrayList();
@@ -167,15 +183,15 @@ public class LoanProductService {
         productClickLogExample.createCriteria().andUpdatedAtGreaterThanOrEqualTo(date).andUidEqualTo(uid);
         productClickLogExample.setOrderByClause("updated_at asc");
         List<ProductClickLog> productClickLogs = productClickLogMapper.selectByExample(productClickLogExample);
-        return (List<Integer>) Collections2.transform(productClickLogs, new Function<ProductClickLog, Integer>() {
+        return Lists.newArrayList(Collections2.transform(productClickLogs, new Function<ProductClickLog, Integer>() {
             @Override
             public Integer apply(ProductClickLog input) {
                 return input.getProductId();
             }
-        });
+        }));
     }
 
-    private Map<String, Integer> getClickNum() {
+    private Map<String, Integer> getClickNumMap() {
         Map<String, Integer> productUserNum = Maps.newHashMap();
         if (1 == configs.getClickNumSwitch()) {
             productUserNum = configs.getProductClickNum();
@@ -205,10 +221,10 @@ public class LoanProductService {
         if((StringUtils.isEmpty(productListClientForm.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientForm.getSortValue())) && (null == productListClientForm.getFilterType() || StringUtils.isEmpty(productListClientForm.getFilterValue()))){
             productExample.setOrderByClause("rank asc");
             List<Product> defaultProducts = productMapper.selectByExample(productExample);
-            List<Product> clickProducts;
             if(CollectionUtils.isNotEmpty(clickProductIds)){
                 criteria.andIdNotIn(clickProductIds);
-                clickProducts = getClickProducts(clickProductIds);
+                List<Product> clickProducts = getClickProducts(clickProductIds);
+                delClickProducts(defaultProducts, clickProducts);
                 defaultProducts.addAll(clickProducts);
             }
             return defaultProducts;
@@ -240,6 +256,14 @@ public class LoanProductService {
         }
 
         return null;
+    }
+
+    private void delClickProducts(List<Product> defaultProducts, List<Product> clickProducts){
+        for (Product product: clickProducts) {
+            if(defaultProducts.contains(product)){
+                defaultProducts.remove(product);
+            }
+        }
     }
 
     private List<Product> getClickProducts(List<Integer> clickProductIds){

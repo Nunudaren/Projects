@@ -60,4 +60,7 @@ public class Configs {
 
     @ConfElement(name = "credittools_default_out_of_time")
     private Integer defaultOutOfTime;
+
+    @ConfElement(name = "credittools_user_recommend_prop")
+    private List<String> userRecommentProp;
 }
