@@ -314,9 +314,6 @@ public class LoanProductService {
         UnionJumpBo jumpBo;
         if (StringUtils.isEmpty(uid)) {
             jumpBo = UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
-            if ("9188".equals(key)) {
-                jumpBo.setJumpUrl(jumpBo.getJumpUrl() + "?relativeUrl=" + URLEncoder.encode(redirectUrl));
-            }
         } else {
             String mobile = getMobileNoCheck(uid);
             IProductsService productsService = productsFactory.getProductService(key);
