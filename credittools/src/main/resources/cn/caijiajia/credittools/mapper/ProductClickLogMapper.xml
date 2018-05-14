@@ -264,9 +264,6 @@
       <if test="productId != null">
         `product_id`,
       </if>
-      <if test="name != null">
-        `name`,
-      </if>
       <if test="clickTime != null">
         `click_time`,
       </if>
@@ -286,9 +283,6 @@
       </if>
       <if test="productId != null">
         #{productId,jdbcType=INTEGER},
-      </if>
-      <if test="name != null">
-        #{name,jdbcType=VARCHAR},
       </if>
       <if test="clickTime != null">
         #{clickTime,jdbcType=INTEGER},
