@@ -51,7 +51,6 @@ public class PengyuanService implements IProductsService {
         PengyuanLoginReq pengyuanLoginReq = new PengyuanLoginReq();
         PengyuanLoginReq.ExtendInfo extendInfo = new PengyuanLoginReq.ExtendInfo();
         try {
-            jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
             String photoUrl = null;
             UserInfo userInfo = userDelegator.getUser(uid);
 
@@ -66,7 +65,7 @@ public class PengyuanService implements IProductsService {
             pengyuanLoginReq.setMobile(userInfo.getMobile());
 
             PhotoSupplierDataResp photoSupplierDataResp = photoSupplierRpc.getUserPhotos(uid);
-            if(photoSupplierDataResp != null) {
+            if (photoSupplierDataResp != null) {
                 List<String> photos = photoSupplierDataResp.getLivePhotos();
                 if (photos.size() > 0 && !StringUtils.isEmpty(photos.get(0))) {
                     photoUrl = hostUrl + "/image?token=" + photos.get(0) + "&bucketName=" + photoSupplierDataResp.getBucketName();
@@ -82,7 +81,7 @@ public class PengyuanService implements IProductsService {
                 extendInfo.setConfidence(Base64Utils.encodeBase64String(resp.getVerifyScore().getBytes()));
             }
 
-            extendInfo.setThresholdLevel("0.6");
+            extendInfo.setThresholdLevel("0.6"); //阈值给固定值
             pengyuanLoginReq.setExtraField(extendInfo);
 
         } catch (Exception e) {
@@ -91,12 +90,8 @@ public class PengyuanService implements IProductsService {
         }
 
         Map<String, Object> reqParam = bulidReqParam(pengyuanLoginReq);
-        try {
-            log.info("鹏元联合登陆请求参数：" + reqParam.toString());
-            jumpUrl = pyBuildReqUrlService.bulidReqUrl(reqParam, jumpUrl);
-        } catch (Exception e) {
-            return UnionJumpBo.builder().jumpUrl(jumpUrl).build();
-        }
+        log.info("鹏元联合登陆请求参数：" + reqParam.toString());
+        jumpUrl = pyBuildReqUrlService.bulidReqUrl(reqParam, jumpUrl);
         return UnionJumpBo.builder().jumpUrl(jumpUrl).build();
     }
 

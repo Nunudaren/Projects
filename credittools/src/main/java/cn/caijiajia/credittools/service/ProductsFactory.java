@@ -32,6 +32,7 @@ public class ProductsFactory {
                 break;
             case "pengyuan":
                 clz = PengyuanService.class;
+                break;
             case "9188" :
                 clz = Lottery9188UnionLoginService.class;
                 break;

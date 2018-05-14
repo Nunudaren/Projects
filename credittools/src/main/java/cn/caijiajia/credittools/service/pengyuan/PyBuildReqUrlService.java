@@ -31,7 +31,8 @@ public class PyBuildReqUrlService {
     private static final String VERSION = "2.0";
     private static final String APPID = "300301010";
 
-    public String bulidReqUrl(Map<String, Object> requestParam , String jumpUrl) {
+    public String bulidReqUrl(Map<String, Object> requestParam , String uri) {
+        String jumpUrl = uri;
         try {
             PyRsaKeyManager pyRsaKeyManager = new PyRsaKeyManager();
 
