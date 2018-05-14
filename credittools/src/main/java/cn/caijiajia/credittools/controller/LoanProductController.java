@@ -67,6 +67,11 @@ public class LoanProductController {
         response.getWriter().write(checkUser);
     }
 
+    @RequestMapping(value = "/lottery9188/unionLoginRedirect", method = RequestMethod.GET)
+    public void lattery9188UnionLoginRedirect(HttpServletRequest request, HttpServletResponse response) {
+        loanProductService.unionLogin(request, response);
+    }
+
     /**
      * 跳转外部指定贷款产品并记录次数
      */

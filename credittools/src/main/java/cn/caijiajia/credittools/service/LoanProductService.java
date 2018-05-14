@@ -52,6 +52,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.List;
@@ -94,6 +95,8 @@ public class LoanProductService {
 
     @Value("${url.credittools}")
     private String credittoolsUrl;
+    @Value("${lottery9188.unionLoginRedirect.url}")
+    private String redirectUrl;
 
     public static final String REDIRECT_URL = "/redirectUrl";
 
@@ -311,6 +314,9 @@ public class LoanProductService {
         UnionJumpBo jumpBo;
         if (StringUtils.isEmpty(uid)) {
             jumpBo = UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
+            if ("9188".equals(key)) {
+                jumpBo.setJumpUrl(jumpBo.getJumpUrl() + "?relativeUrl=" + URLEncoder.encode(redirectUrl));
+            }
         } else {
             String mobile = getMobileNoCheck(uid);
             IProductsService productsService = productsFactory.getProductService(key);
