@@ -44,10 +44,6 @@ public class ErrorResponseConstants {
     public static final int REDIRECT_FAILED_CODE = 6039;
     public static final String REDIRECT_FAILED_MSG = "重定向失败";
 
-    public static final int GET_USER_CLICK_NUM_FAILED_CODE = 6003;
-    public static final String GET_USER_CLICK_NUM_FAILED_MSG = "获取申请人数失败";
-
-
     public static final String LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG = "参数错误：user_id为空或不存在";
 
 }

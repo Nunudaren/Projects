@@ -201,9 +201,6 @@ public class LoanProductService {
             productUserNum = configs.getProductClickNum();
         }
         List<ProductClickNumBo> productClickNum = getProductClickNum();
-        if(CollectionUtils.isEmpty(productClickNum) && MapUtils.isEmpty(productUserNum)){
-            throw new CjjClientException(ErrorResponseConstants.GET_USER_CLICK_NUM_FAILED_CODE, ErrorResponseConstants.GET_USER_CLICK_NUM_FAILED_MSG);
-        }
         if(CollectionUtils.isEmpty(productClickNum)){
             return productUserNum;
         }
