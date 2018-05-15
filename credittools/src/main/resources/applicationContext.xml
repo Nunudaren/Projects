@@ -130,6 +130,20 @@
         <constructor-arg value="${url.userloan}"/>
     </bean>
 
+
+    <bean id="s3Service" class="cn.caijiajia.awsservice.S3Service">
+        <constructor-arg value="${aws.s3.accessKey}" />
+        <constructor-arg value="${aws.s3.secretKey}" />
+    </bean>
+    <bean id="s3StoreService" class="cn.caijiajia.s3util.mapper.S3StoreService" lazy-init="true">
+        <property name="s3StoreBucketName" value="${aws.s3.accessKey}"/>
+        <property name="s3StoreBucketNameInc" value="${aws.s3.accessKey}"/>
+    </bean>
+    <bean id="s3BoStoreMapper" class="cn.caijiajia.s3util.mapper.S3BoStoreMapper" lazy-init="true">
+    </bean>
+    <bean id="s3StoreMapper" class="cn.caijiajia.s3util.mapper.S3StoreMapper" lazy-init="true">
+    </bean>
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
             <value>classpath:spring-config.properties</value>

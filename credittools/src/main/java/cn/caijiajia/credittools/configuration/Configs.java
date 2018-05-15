@@ -43,7 +43,6 @@ public class Configs {
     @ConfElement(name = "loanproduct_loanproducts_filters")
     private LoanProductFilterVo loanProductFilters;
 
-<<<<<<< HEAD
     @ConfElement(name = "credittools_union_login_products")
     private List<String> unionLoginProducts;
 
@@ -57,8 +56,5 @@ public class Configs {
 
     @ConfElement(name = "credittools_click_num_desp")
     private String clickNumDesp;
-=======
-    @ConfElement(name = "credittools_external_url")
-    private String externalUrl;
->>>>>>> pengyuan login
+
 }
