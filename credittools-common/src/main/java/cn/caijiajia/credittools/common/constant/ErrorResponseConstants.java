@@ -38,6 +38,9 @@ public class ErrorResponseConstants {
     public static final int USER_NOT_EXISTS_CODE = 8901;
     public static final String USER_NOT_EXISTS_MESSAGE = "用户不存在";
 
+    public static final int USER_PHONE_NOT_EXISTS_CODE = 8902;
+    public static final String USER_PHONE_NOT_EXISTS_MESSAGE = "用户手机号不存在";
+
     public static final int GET_UNION_URL_ERR_CODE = 6002;
     public static final String GET_UNION_URL_ERR_MSG = "未配置联合登录url";
 

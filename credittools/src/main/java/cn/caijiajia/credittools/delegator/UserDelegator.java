@@ -1,34 +1,34 @@
 package cn.caijiajia.credittools.delegator;
 
-
+import cn.caijiajia.credittools.bo.UserInfo;
+import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.httpclient.HttpClientTemplate;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * @author zhouyangbo
- * @description
- * @Date：Created in 16:43 2018/5/10
+ * @Author:chendongdong
+ * @Date:2018/5/10
  */
+
 @Component
 public class UserDelegator {
 
-    private static final String URL_VERIFY_SESSION = "/verifySession";
+    private static final String URL_USER_INFO = "/users/%s";
 
     @Autowired
     private HttpClientTemplate httpClient;
+    @Autowired
+    private String userLoanUrl;
 
-    @Value("${url.user}")
-    private String userUrl;
-
-    public void verifySession(String uid, String sessionId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("uid", uid);
-        params.put("sessionId", sessionId);
-        httpClient.doPost(userUrl + URL_VERIFY_SESSION, params);
+    public UserInfo getUser(String uid) {
+        UserInfo userInfo = JSONObject.parseObject(httpClient.doGet(userLoanUrl + String.format(URL_USER_INFO, uid)), UserInfo.class);
+        if (userInfo == null) {
+            throw new CjjClientException(ErrorResponseConstants.USER_NOT_EXISTS_CODE, ErrorResponseConstants.USER_NOT_EXISTS_MESSAGE);
+        }
+        return userInfo;
     }
+
 }

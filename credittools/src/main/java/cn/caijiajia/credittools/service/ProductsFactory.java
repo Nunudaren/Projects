@@ -9,6 +9,7 @@
  */
 package cn.caijiajia.credittools.service;
 
+import cn.caijiajia.credittools.service.pengyuan.PengyuanService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.ContextLoader;
@@ -28,6 +29,9 @@ public class ProductsFactory {
                 break;
             case "youyu" :
                 clz = YouyuUnionLoginService.class;
+                break;
+            case "pengyuan":
+                clz = PengyuanService.class;
                 break;
             case "9188" :
                 clz = Lottery9188UnionLoginService.class;

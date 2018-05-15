@@ -10,13 +10,11 @@
 package cn.caijiajia.credittools.controller;
 
 import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
-import cn.caijiajia.credittools.common.req.Lattery9188CheckUserResp;
 import cn.caijiajia.credittools.common.req.ProductListClientReq;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,6 +65,11 @@ public class LoanProductController {
     public void checkUser(Lattery9188CheckUserReq lattery9188CheckUserReq,HttpServletResponse response) throws IOException {
         String checkUser = loanProductService.checkUser(lattery9188CheckUserReq);
         response.getWriter().write(checkUser);
+    }
+
+    @RequestMapping(value = "/lottery9188/unionLoginRedirect", method = RequestMethod.GET)
+    public void lattery9188UnionLoginRedirect(HttpServletRequest request, HttpServletResponse response) {
+        loanProductService.unionLogin(request, response);
     }
 
     /**
