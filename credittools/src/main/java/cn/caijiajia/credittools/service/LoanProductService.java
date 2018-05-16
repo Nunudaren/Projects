@@ -300,15 +300,22 @@ public class LoanProductService {
             clickProductIds = getClickProductIds();
         }
         productExample.setOrderByClause("rank asc");
+        String uid = ParameterThreadLocal.getUid();
         List<Product> defaultProducts = productMapper.selectByExample(productExample);
         if(CollectionUtils.isEmpty(clickProductIds)){
+            List<Integer> ids = Lists.newArrayList(Collections2.transform(defaultProducts, new Function<Product, Integer>() {
+                @Override
+                public Integer apply(Product input) {
+                    return input.getId();
+                }
+            }));
+            redisClient.getRedisTemplate().opsForValue().set(uid, JSON.toJSONString(ids));
             return defaultProducts;
         }
         criteria.andIdNotIn(clickProductIds);
         List<Product> clickProducts = getClickProducts(clickProductIds);
         List<Product> noClickProducts = delClickProducts(defaultProducts, clickProducts);
         noClickProducts.addAll(clickProducts);
-        String uid = ParameterThreadLocal.getUid();
         if(StringUtils.isNotEmpty(uid) && CollectionUtils.isNotEmpty(noClickProducts)){
             List<Integer> ids = Lists.newArrayList(Collections2.transform(noClickProducts, new Function<Product, Integer>() {
                 @Override
