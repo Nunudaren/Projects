@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class LoanProductMgrController {
     private LoanProductMgrService loanProductMgrService;
 
     @RequestMapping(value = "/editProduct", method = RequestMethod.POST)
-    public void addOrUpdateProduct(@RequestBody ProductForm productForm) {
+    public void addOrUpdateProduct(@RequestBody @Valid ProductForm productForm) {
         productForm.checkField();
         loanProductMgrService.addOrUpdateProduct(productForm);
     }

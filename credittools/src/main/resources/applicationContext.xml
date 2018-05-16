@@ -17,6 +17,12 @@
     <!--<import resource="classpath:applicationContext-rabbitmq.xml"/>-->
     <import resource="classpath:applicationContext-persistence.xml"/>
 
+    <bean id="redisClient" class="cn.caijiajia.redis.client.RedisClient">
+        <property name="hostName" value="${redis.host.sequence.sequence}"/>
+        <property name="port" value="${redis.port.sequence.sequence}"/>
+        <property name="database" value="${redis.database.sequence.sequence}"/>
+    </bean>
+
     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
         <property name="driverClassName" value="${mysql.driver}"/>
         <property name="url"
