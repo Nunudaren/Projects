@@ -17,7 +17,9 @@ import cn.caijiajia.credittools.vo.LoanProductVo;
 import cn.caijiajia.credittools.vo.ProductVo;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.exceptions.CjjServerException;
+import cn.caijiajia.redis.client.RedisClient;
 import cn.caijiajia.user.rpc.UserRpc;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
@@ -28,6 +30,9 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
@@ -65,6 +70,9 @@ public class LoanProductMgrService {
 
     @Autowired
     private UnionLoginLogService unionLoginLogService;
+
+    @Autowired
+    private RedisClient redisClient;
 
     /**
      * 按条件查询产品列表
@@ -163,6 +171,7 @@ public class LoanProductMgrService {
             log.error("更新产品位置序号失败！");
             throw new CjjServerException(ErrorResponseConstants.CHANGE_PRODUCT_RANK_FAILED_CODE, ErrorResponseConstants.CHANGE_PRODUCT_RANK_FAILED_MSG);
         }
+        flushDb();
 
     }
 
@@ -194,6 +203,7 @@ public class LoanProductMgrService {
             log.error("更新产品位置序号失败！");
             throw new CjjServerException(ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_CODE, ErrorResponseConstants.CHANGE_PRODUCT_STATUS_FAILED_MSG);
         }
+        flushDb();
     }
 
 
@@ -315,6 +325,19 @@ public class LoanProductMgrService {
         }
         log.error("未配置联合登录Url, loanmarket_union_login_url");
         throw new CjjClientException(ErrorResponseConstants.GET_UNION_URL_ERR_CODE, ErrorResponseConstants.GET_UNION_URL_ERR_MSG);
+    }
+
+    /**
+     * 清除缓存
+     */
+    private void flushDb(){
+        redisClient.getRedisTemplate().execute(new RedisCallback<Object>() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                connection.flushDb();
+                return null;
+            }
+        });
     }
 
 }

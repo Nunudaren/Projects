@@ -300,6 +300,9 @@
             <artifactId>xstream</artifactId>
             <version>1.4.10</version>
         </dependency>
-
+        <dependency>
+            <groupId>cn.caijiajia</groupId>
+            <artifactId>redis-client</artifactId>
+        </dependency>
     </dependencies>
 </project>

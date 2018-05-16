@@ -32,6 +32,11 @@
 			</dependency>
 			<dependency>
 				<groupId>cn.caijiajia</groupId>
+				<artifactId>redis-client</artifactId>
+				<version>${project.release.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.caijiajia</groupId>
 				<artifactId>utils</artifactId>
 				<version>${project.release.version}</version>
 			</dependency>
