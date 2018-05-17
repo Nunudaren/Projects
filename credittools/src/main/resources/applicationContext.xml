@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
-       xmlns:cjjrabbit="http://www.caijiajia.cn/schema/cjjrabbit"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       http://www.springframework.org/schema/tx
       http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
       http://www.springframework.org/schema/util
-      http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd http://www.caijiajia.cn/schema/cjjrabbit http://www.caijiajia.cn/schema/cjjrabbit/cjj-rabbit.xsd">
+      http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:applicationContext-base.xml"/>
     <import resource="classpath:applicationContext-confplusclient.xml"/>
     <import resource="classpath:applicationContext-redisclient.xml"/>
     <import resource="classpath:applicationContext-sequenceclient.xml"/>
     <import resource="classpath:applicationContext-distributedlock.xml"/>
-    <!--<import resource="classpath:applicationContext-rabbitmq.xml"/>-->
     <import resource="classpath:applicationContext-persistence.xml"/>
 
     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
@@ -68,47 +65,6 @@
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-
-    <rabbit:connection-factory id="connectionFactory" addresses="${rabbitmq.addresses}" username="${rabbitmq.username}"
-                               password="${rabbitmq.password}" publisher-confirms="true"/>
-    <!-- 管理组件 -->
-    <rabbit:admin connection-factory="connectionFactory"/>
-
-    <!-- 存放消费失败消息的queue -->
-
-    <!-- 消息发送组件，使用jsonMessageConverter -->
-    <bean id="rabbitTemplate" class="cn.caijiajia.rabbitmq.client.CjjRabbitTemplate">
-        <constructor-arg ref="connectionFactory"/>
-        <property name="messageConverter" ref="jsonConverter"/>
-        <property name="retryTemplate" ref="retryTemplate"/>
-        <property name="recoveryCallback" ref="recoveryCallback"/>
-    </bean>
-
-    <!-- 消费重试Advice -->
-    <bean id="retryAdvice"
-          class="org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptorFactoryBean">
-        <property name="messageRecoverer" ref="rejectAndDontRequeueRecoverer"/>
-        <property name="retryOperations" ref="retryTemplate"/>
-    </bean>
-    <bean id="rejectAndDontRequeueRecoverer"
-          class="org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer"/>
-
-    <!-- 使用json进行消息序列化和反序列化 -->
-    <bean id="jsonConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter"/>
-
-    <!-- 重试策略 -->
-    <bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
-        <property name="backOffPolicy">
-            <bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
-                <property name="initialInterval" value="60000"/>
-                <property name="multiplier" value="1.0"/>
-                <property name="maxInterval" value="1200000"/>
-            </bean>
-        </property>
-    </bean>
-
-    <!-- 消息所有重发失败后的回调方法 -->
-    <bean id="recoveryCallback" class="cn.caijiajia.rabbitmq.client.CjjRabbitRecoveryCallback"/>
 
     <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
         <constructor-arg index="0" ref="sqlSessionFactory"/>

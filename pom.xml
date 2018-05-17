@@ -96,11 +96,6 @@
 			<!-- <dependency> <groupId>wsdl4j</groupId> <artifactId>wsdl4j</artifactId> 
 				<version>1.5.1</version> </dependency> -->
 			<dependency>
-				<groupId>cn.caijiajia</groupId>
-				<artifactId>rabbitmq-client</artifactId>
-				<version>${project.release.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-messaging</artifactId>
 				<version>4.1.7.RELEASE</version>
