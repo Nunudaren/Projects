@@ -4,15 +4,15 @@ import cn.caijiajia.creditdata.common.resp.FaceVerifyDataResp;
 import cn.caijiajia.creditdata.common.resp.PhotoSupplierDataResp;
 import cn.caijiajia.creditdata.rpc.PhotoSupplierRpc;
 import cn.caijiajia.credittools.bo.UnionJumpBo;
-import cn.caijiajia.credittools.bo.UserInfo;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.common.req.PengyuanLoginReq;
 import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
-import cn.caijiajia.credittools.delegator.UserDelegator;
 import cn.caijiajia.credittools.service.IProductsService;
 import cn.caijiajia.credittools.service.LoanProductMgrService;
 import cn.caijiajia.framework.exceptions.CjjClientException;
+import cn.caijiajia.userloan.common.resp.UserResp;
+import cn.caijiajia.userloan.rpc.UserInfoRpc;
 import cn.caijiajia.utils.crypto.Base64Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +38,7 @@ public class PengyuanService implements IProductsService {
     @Autowired
     private LoanProductMgrService loanProductMgrService;
     @Autowired
-    private UserDelegator userDelegator;
+    private UserInfoRpc userInfoRpc;
     @Autowired
     private PhotoSupplierRpc photoSupplierRpc;
 
@@ -51,7 +51,10 @@ public class PengyuanService implements IProductsService {
         PengyuanLoginReq.ExtendInfo extendInfo = new PengyuanLoginReq.ExtendInfo();
         try {
             String photoUrl = null;
-            UserInfo userInfo = userDelegator.getUser(uid);
+            UserResp userInfo = userInfoRpc.getUser(uid);
+            if (userInfo == null) {
+                throw new CjjClientException(ErrorResponseConstants.USER_NOT_EXISTS_CODE, ErrorResponseConstants.USER_NOT_EXISTS_MESSAGE);
+            }
 
             pengyuanLoginReq.setUuid(uid);
             pengyuanLoginReq.setName(userInfo.getName());

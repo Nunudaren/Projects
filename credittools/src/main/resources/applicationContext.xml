@@ -136,7 +136,6 @@
         <constructor-arg value="${url.userloan}"/>
     </bean>
 
-
     <bean id="s3Service" class="cn.caijiajia.awsservice.S3Service">
         <constructor-arg value="${aws.s3.accessKey}" />
         <constructor-arg value="${aws.s3.secretKey}" />

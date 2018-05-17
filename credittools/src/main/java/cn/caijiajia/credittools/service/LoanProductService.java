@@ -22,7 +22,6 @@ import cn.caijiajia.credittools.common.resp.ProductClientResp;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.ProductSortEnum;
-import cn.caijiajia.credittools.delegator.UserDelegator;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductClickLog;
 import cn.caijiajia.credittools.domain.ProductClickLogExample;
@@ -87,9 +86,6 @@ public class LoanProductService {
 
     @Autowired
     private LoanProductMgrService loanProductMgrService;
-
-    @Autowired
-    private UserDelegator userDelegator;
 
     @Autowired
     private ProductClickLogMapper productClickLogMapper;
