@@ -303,13 +303,15 @@ public class LoanProductService {
         String uid = ParameterThreadLocal.getUid();
         List<Product> defaultProducts = productMapper.selectByExample(productExample);
         if(CollectionUtils.isEmpty(clickProductIds)){
-            List<Integer> ids = Lists.newArrayList(Collections2.transform(defaultProducts, new Function<Product, Integer>() {
-                @Override
-                public Integer apply(Product input) {
-                    return input.getId();
-                }
-            }));
-            redisClient.getRedisTemplate().opsForValue().set(uid, JSON.toJSONString(ids));
+            if(StringUtils.isNotEmpty(uid)){
+                List<Integer> ids = Lists.newArrayList(Collections2.transform(defaultProducts, new Function<Product, Integer>() {
+                    @Override
+                    public Integer apply(Product input) {
+                        return input.getId();
+                    }
+                }));
+                redisClient.getRedisTemplate().opsForValue().set(uid, JSON.toJSONString(ids));
+            }
             return defaultProducts;
         }
         criteria.andIdNotIn(clickProductIds);
