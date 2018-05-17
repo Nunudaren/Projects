@@ -57,4 +57,12 @@ public class Configs {
     @ConfElement(name = "credittools_click_num_desp")
     private String clickNumDesp;
 
+    @ConfElement(name = "credittools_client_proxy_url")
+    private String credittoolsUrl;
+
+    @ConfElement(name = "credittools_default_out_of_time")
+    private Integer defaultOutOfTime;
+
+    @ConfElement(name = "credittools_user_recommend_prop")
+    private List<String> userRecommentProp;
 }

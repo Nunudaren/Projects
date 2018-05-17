@@ -25,6 +25,7 @@ import cn.caijiajia.credittools.constant.ProductSortEnum;
 import cn.caijiajia.credittools.delegator.UserDelegator;
 import cn.caijiajia.credittools.domain.Product;
 import cn.caijiajia.credittools.domain.ProductClickLog;
+import cn.caijiajia.credittools.domain.ProductClickLogExample;
 import cn.caijiajia.credittools.domain.ProductExample;
 import cn.caijiajia.credittools.mapper.ProductClickLogMapper;
 import cn.caijiajia.credittools.mapper.ProductMapper;
@@ -33,31 +34,34 @@ import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.threadlocal.ParameterThreadLocal;
 import cn.caijiajia.loanproduct.common.Resp.LoanProductResp;
+import cn.caijiajia.redis.client.RedisClient;
 import cn.caijiajia.user.common.resp.UserVo;
 import cn.caijiajia.user.rpc.UserRpc;
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.jedis.JedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by liujianyang on 2018/5/9.
@@ -93,8 +97,8 @@ public class LoanProductService {
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
 
-    @Value("${url.credittools}")
-    private String credittoolsUrl;
+    @Autowired
+    private RedisClient redisClient;
 
     public static final String REDIRECT_URL = "/redirectUrl";
 
@@ -149,14 +153,14 @@ public class LoanProductService {
 
     public ProductListClientResp getProductListClient(ProductListClientReq productListClientReq) {
         String guideWords = null;
-        List<Product> products = getProducts(productListClientReq);
         if (null != configs.getGuideWords()) {
             guideWords = configs.getGuideWords();
         }
+        List<Product> products = getProducts(productListClientReq);
         List<ProductClientResp> rtnVo = Lists.newArrayList();
         if (CollectionUtils.isNotEmpty(products)) {
-            Map<String, Integer> clickNum = getClickNum();
-            rtnVo = transform(products, clickNum);
+            Map<String, Integer> clickNumMap = getClickNumMap();
+            rtnVo = transform(products, clickNumMap);
         }
         return ProductListClientResp.builder()
                 .loanProductList(rtnVo)
@@ -164,15 +168,70 @@ public class LoanProductService {
                 .build();
     }
 
-    private Map<String, Integer> getClickNum() {
+    private List<Integer> getProducts(){
+        String uid = ParameterThreadLocal.getUid();
+        String resp = redisClient.getRedisTemplate().opsForValue().get(uid);
+        if(StringUtils.isEmpty(resp)){
+            return null;
+        }
+        return  JSON.parseArray(resp, Integer.class);
+
+    }
+
+    private boolean isOutOfTime(){
+        String uid = ParameterThreadLocal.getUid();
+        if(StringUtils.isEmpty(uid)){
+            return true;
+        }
+        Integer singleOutOfTime = configs.getDefaultOutOfTime();
+        Date date = new DateTime().minusHours(singleOutOfTime).toDate();
+
+        ProductClickLogExample productClickLogExample = new ProductClickLogExample();
+        productClickLogExample.createCriteria().andUidEqualTo(uid).andUpdatedAtGreaterThanOrEqualTo(date);
+
+        List<ProductClickLog> productClickLogs = productClickLogMapper.selectByExample(productClickLogExample);
+        return CollectionUtils.isEmpty(productClickLogs);
+    }
+
+    private boolean getCustomProp(){
+        List<String> userRecommentProp = configs.getUserRecommentProp();
+        String uid = ParameterThreadLocal.getUid();
+        if(StringUtils.isEmpty(uid)){
+            return false;
+        }
+        String mobile = getMobileNoCheck(uid);
+        if(StringUtils.isEmpty(mobile)){
+            return false;
+        }
+        String endOfMobile = mobile.substring(mobile.length() - 1, mobile.length());
+        return userRecommentProp.contains(endOfMobile);
+    }
+
+    private List<Integer> getClickProductIds(){
+        Integer singleOutOfTime = configs.getDefaultOutOfTime();
+        Date date = new DateTime().minusHours(singleOutOfTime).toDate();
+        String uid = ParameterThreadLocal.getUid();
+        if(StringUtils.isEmpty(uid)){
+            return Lists.newArrayList();
+        }
+        ProductClickLogExample productClickLogExample = new ProductClickLogExample();
+        productClickLogExample.createCriteria().andUpdatedAtLessThanOrEqualTo(date).andUidEqualTo(uid);
+        productClickLogExample.setOrderByClause("updated_at asc");
+        List<ProductClickLog> productClickLogs = productClickLogMapper.selectByExample(productClickLogExample);
+        return Lists.newArrayList(Collections2.transform(productClickLogs, new Function<ProductClickLog, Integer>() {
+            @Override
+            public Integer apply(ProductClickLog input) {
+                return input.getProductId();
+            }
+        }));
+    }
+
+    private Map<String, Integer> getClickNumMap() {
         Map<String, Integer> productUserNum = Maps.newHashMap();
         if (1 == configs.getClickNumSwitch()) {
             productUserNum = configs.getProductClickNum();
         }
         List<ProductClickNumBo> productClickNum = getProductClickNum();
-        if(CollectionUtils.isEmpty(productClickNum) && MapUtils.isEmpty(productUserNum)){
-            throw new CjjClientException(ErrorResponseConstants.GET_USER_CLICK_NUM_FAILED_CODE, ErrorResponseConstants.GET_USER_CLICK_NUM_FAILED_MSG);
-        }
         if(CollectionUtils.isEmpty(productClickNum)){
             return productUserNum;
         }
@@ -187,6 +246,11 @@ public class LoanProductService {
     }
 
     private List<Product> getProducts(ProductListClientReq productListClientReq) {
+        //没有筛选条件的默认排序
+        if((StringUtils.isEmpty(productListClientReq.getSortValue()) || ProductSortEnum.DEFAULT.getValue().equals(productListClientReq.getSortValue())) && (null == productListClientReq.getFilterType() || StringUtils.isEmpty(productListClientReq.getFilterValue()))){
+            //根据用户点击次数以及20%（默认20%，可配置）用户的个性化排序
+            return customProducts();
+        }
         ProductExample productExample = new ProductExample();
         ProductExample.Criteria criteria = productExample.createCriteria();
         criteria.andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
@@ -219,36 +283,78 @@ public class LoanProductService {
         return null;
     }
 
-    private List<ProductClientResp> transform(List<Product> loanProducts) {
-        return Lists.newArrayList(Collections2.transform(loanProducts, new Function<Product, ProductClientResp>() {
-            @Override
-            public ProductClientResp apply(Product input) {
-                return ProductClientResp.builder()
-                        .feeRate(input.getShowFeeRate() ? input.getFeeRate() : null)
-                        .iconUrl(input.getIconUrl())
-                        .id(input.getProductId())
-                        .jumpUrl(input.getJumpUrl() + (configs.getUnionLoginProducts().contains(input.getProductId()) ? (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()) : ""))
-                        .mark(input.getMark())
-                        .name(input.getName())
-                        .promotion(input.getPromotion())
-                        .optionalInfo(Lists.newArrayList(Collections2.transform(buildOptionalInfo(input), new Function<LoanProductResp.OptionalInfo, ProductClientResp.OptionalInfo>() {
-                            @Override
-                            public ProductClientResp.OptionalInfo apply(LoanProductResp.OptionalInfo input) {
-                                return ProductClientResp.OptionalInfo.builder().type(input.getType()).value(input.getValue()).build();
-                            }
-                        })))
-                        .build();
+    private List<Product> customProducts(){
+        ProductExample productExample = new ProductExample();
+        ProductExample.Criteria criteria = productExample.createCriteria();
+        criteria.andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS);
+        //配置一定量的用户使用个性化推荐（默认20%）
+        boolean isCustom = getCustomProp();
+        if (!isOutOfTime() && isCustom) {
+            List<Integer> ids = getProducts();
+            if(CollectionUtils.isNotEmpty(ids)){
+                return getClickProducts(ids);
             }
-        }));
+        }
+        List<Integer> clickProductIds = Lists.newArrayList();
+        if (isCustom) {
+            clickProductIds = getClickProductIds();
+        }
+        productExample.setOrderByClause("rank asc");
+        String uid = ParameterThreadLocal.getUid();
+        List<Product> defaultProducts = productMapper.selectByExample(productExample);
+        if(CollectionUtils.isEmpty(clickProductIds)){
+            List<Integer> ids = Lists.newArrayList(Collections2.transform(defaultProducts, new Function<Product, Integer>() {
+                @Override
+                public Integer apply(Product input) {
+                    return input.getId();
+                }
+            }));
+            redisClient.getRedisTemplate().opsForValue().set(uid, JSON.toJSONString(ids));
+            return defaultProducts;
+        }
+        criteria.andIdNotIn(clickProductIds);
+        List<Product> clickProducts = getClickProducts(clickProductIds);
+        List<Product> noClickProducts = delClickProducts(defaultProducts, clickProducts);
+        noClickProducts.addAll(clickProducts);
+        if(StringUtils.isNotEmpty(uid) && CollectionUtils.isNotEmpty(noClickProducts)){
+            List<Integer> ids = Lists.newArrayList(Collections2.transform(noClickProducts, new Function<Product, Integer>() {
+                @Override
+                public Integer apply(Product input) {
+                    return input.getId();
+                }
+            }));
+            redisClient.getRedisTemplate().opsForValue().set(uid, JSON.toJSONString(ids));
+        }
+        return noClickProducts;
     }
+
+    private List<Product> delClickProducts(List<Product> defaultProducts, List<Product> clickProducts){
+        List<Product> noClickProducts = Lists.newArrayList();
+        for (Product product: defaultProducts) {
+            if(!clickProducts.contains(product)){
+                noClickProducts.add(product);
+            }
+        }
+        return noClickProducts;
+    }
+
+    private List<Product> getClickProducts(List<Integer> clickProductIds){
+        ProductExample productExample = new ProductExample();
+        productExample.createCriteria().andStatusEqualTo(CredittoolsConstants.ONLINE_STATUS).andIdIn(clickProductIds);
+        productExample.setOrderByClause("field(id,"+ Joiner.on(",").join(clickProductIds) +" )");
+        return productMapper.selectByExample(productExample);
+    }
+
     private List<ProductClientResp> transform(List<Product> loanProducts, Map<String, Integer> clickNum) {
+        String credittoolsUrl = configs.getCredittoolsUrl();
         List<ProductClientResp> products = Lists.newArrayList();
         for (Product product : loanProducts) {
             products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
                     .id(product.getProductId())
-                    .jumpUrl( credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()))
+                    //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
+                    .jumpUrl( credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()) + (CredittoolsConstants.HB_CHANNEL.equals(ParameterThreadLocal.getRequestChannel()) ? "&r_c=" + CredittoolsConstants.HB_CHANNEL : ""))
                     .mark(product.getMark())
                     .name(product.getName())
                     .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
@@ -270,7 +376,8 @@ public class LoanProductService {
             return 0 + configs.getClickNumDesp();
         }
         String clickNum = num.toString();
-        if (num > 10000) {
+        if (num >= 10000) {
+            df.setRoundingMode(RoundingMode.FLOOR);
             clickNum = df.format(Double.valueOf(num) / 10000) + "万";
         }
         return clickNum + configs.getClickNumDesp();
@@ -354,8 +461,11 @@ public class LoanProductService {
             uid = "not login user";
         }
         String id = request.getParameter("id");
-
-        taskExecutor.execute(new ClickTimeInc(uid, id));
+        // 非客户端进入的贷款产品连接不记录点击次数
+        String requestChannel = request.getParameter("r_c");
+        if(CredittoolsConstants.HB_CHANNEL.equals(requestChannel)){
+            taskExecutor.execute(new ClickTimeInc(uid, id));
+        }
         try {
             response.sendRedirect(getJumpUrl(Integer.valueOf(id), request.getParameter("p_u")));
         } catch (IOException e) {

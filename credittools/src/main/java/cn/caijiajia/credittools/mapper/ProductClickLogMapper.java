@@ -48,13 +48,11 @@ public interface ProductClickLogMapper {
      */
     @Insert({
         "insert into `product_click_log` (`id`, `uid`, ",
-        "`product_id`, `name`, ",
-        "`click_time`, `created_at`, ",
-        "`updated_at`)",
+        "`product_id`, `click_time`, ",
+        "`created_at`, `updated_at`)",
         "values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=VARCHAR}, ",
-        "#{productId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, ",
-        "#{clickTime,jdbcType=INTEGER}, #{createdAt,jdbcType=TIMESTAMP}, ",
-        "#{updatedAt,jdbcType=TIMESTAMP})"
+        "#{productId,jdbcType=INTEGER}, #{clickTime,jdbcType=INTEGER}, ",
+        "#{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP})"
     })
     int insert(ProductClickLog record);
 
@@ -82,7 +80,7 @@ public interface ProductClickLogMapper {
      */
     @Select({
         "select",
-        "`id`, `uid`, `product_id`, `name`, `click_time`, `created_at`, `updated_at`",
+        "`id`, `uid`, `product_id`, `click_time`, `created_at`, `updated_at`",
         "from `product_click_log`",
         "where `id` = #{id,jdbcType=INTEGER}"
     })
@@ -123,7 +121,6 @@ public interface ProductClickLogMapper {
         "update `product_click_log`",
         "set `uid` = #{uid,jdbcType=VARCHAR},",
           "`product_id` = #{productId,jdbcType=INTEGER},",
-          "`name` = #{name,jdbcType=VARCHAR},",
           "`click_time` = #{clickTime,jdbcType=INTEGER},",
           "`created_at` = #{createdAt,jdbcType=TIMESTAMP},",
           "`updated_at` = #{updatedAt,jdbcType=TIMESTAMP}",

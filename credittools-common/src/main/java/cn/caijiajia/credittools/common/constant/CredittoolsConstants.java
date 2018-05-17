@@ -11,6 +11,8 @@ public class CredittoolsConstants {
 
     public static final String ALL_STATUS = "all";
 
+    public static final String HB_CHANNEL = "hb";
+
     /**
      * 9188彩票验证用户在还呗是否已登录
      * 已登录
