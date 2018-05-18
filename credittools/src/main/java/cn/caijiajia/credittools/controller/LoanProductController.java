@@ -1,75 +1,36 @@
+/**
+ * Caijiajia confidential
+ * <p>
+ * Copyright (C) 2017 Shanghai Shuhe Co., Ltd. All rights reserved.
+ * <p>
+ * No parts of this file may be reproduced or transmitted in any form or by any means,
+ * electronic, mechanical, photocopying, recording, or otherwise, without prior written
+ * permission of Shanghai Shuhe Co., Ltd.
+ */
 package cn.caijiajia.credittools.controller;
 
-import cn.caijiajia.credittools.form.*;
+import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
+import cn.caijiajia.credittools.common.req.ProductListClientReq;
+import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
-import cn.caijiajia.credittools.vo.LoanProductVo;
-import cn.caijiajia.credittools.vo.ProductListClientVo;
-import cn.caijiajia.credittools.vo.ProductVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
 
 /**
- * @Author:chendongdong
- * @Date:2018/4/27
+ * Created by liujianyang on 2018/5/9.
  */
 @RestController
 public class LoanProductController {
 
     @Autowired
     private LoanProductService loanProductService;
-
-    @RequestMapping(value = "/editProduct", method = RequestMethod.POST)
-    public void addOrUpdateProduct(@RequestBody ProductForm productForm) {
-        productForm.checkField();
-        loanProductService.addOrUpdateProduct(productForm);
-    }
-
-    @RequestMapping(value = "/productDetail/{productId}", method = RequestMethod.GET)
-    public ProductVo getProduct(@PathVariable String productId) {
-        return loanProductService.getProductVoById(productId);
-    }
-
-    @RequestMapping(value = "/uploadImg", method = RequestMethod.POST)
-    public String uploadIcon(@RequestParam MultipartFile file) throws Exception {
-        return loanProductService.uploadImg(file);
-    }
-
-    /**
-     * 按条件查询产品列表
-     *
-     * @param loanProductListForm
-     * @return
-     */
-    @RequestMapping(value = "/getProductList", method = RequestMethod.POST)
-    public LoanProductVo getProductList(@RequestBody LoanProductListForm loanProductListForm) {
-        return loanProductService.getProductList(loanProductListForm);
-    }
-
-    /**
-     * 修改产品的展示位置
-     *
-     * @param rankForm
-     */
-    @RequestMapping(value = "/changeProductRank", method = RequestMethod.POST)
-    public void changeRankByProductId(@RequestBody RankForm rankForm) {
-        loanProductService.upateRankByProductId(rankForm);
-    }
-
-    /**
-     * 获取配置项标签
-     * @return
-     */
-    @RequestMapping(value = "/productConfigTags", method = RequestMethod.GET)
-    public List<String> getLoanProductTags(){
-        return loanProductService.getLoanProductTags();
-    }
 
     /**
      * 贷款产品聚合页，获取筛选选项接口
@@ -85,18 +46,8 @@ public class LoanProductController {
      * 贷款产品聚合页，获取贷款产品列表
      */
     @RequestMapping(value = "/getLoanProductList", method = RequestMethod.GET)
-    public ProductListClientVo getLoanProductListClient(ProductListClientForm productListClientForm) {
-        return loanProductService.getProductListClient(productListClientForm);
-    }
-
-    /**
-     * 更改产品上/下线状态
-     *
-     * @param statusForm
-     */
-    @RequestMapping(value = "/changeProductStatus", method = RequestMethod.POST)
-    public void changeProductStatus(@RequestBody StatusForm statusForm) {
-        loanProductService.updateLineStatus(statusForm);
+    public ProductListClientResp getLoanProductListClient(ProductListClientReq productListClientReq) {
+        return loanProductService.getProductListClient(productListClientReq);
     }
 
     /**
@@ -108,6 +59,25 @@ public class LoanProductController {
     @RequestMapping(value = "/union/login", method = RequestMethod.GET)
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
         loanProductService.unionLogin(request, response);
+    }
+
+    @RequestMapping(value = "/lottery9188/checkUser", method = RequestMethod.POST)
+    public void checkUser(Lattery9188CheckUserReq lattery9188CheckUserReq,HttpServletResponse response) throws IOException {
+        String checkUser = loanProductService.checkUser(lattery9188CheckUserReq);
+        response.getWriter().write(checkUser);
+    }
+
+    @RequestMapping(value = "/lottery9188/unionLoginRedirect", method = RequestMethod.GET)
+    public void lattery9188UnionLoginRedirect(HttpServletRequest request, HttpServletResponse response) {
+        loanProductService.unionLogin(request, response);
+    }
+
+    /**
+     * 跳转外部指定贷款产品并记录次数
+     */
+    @RequestMapping(value = "/redirectUrl", method = RequestMethod.GET)
+    public void redirectUrl(HttpServletRequest request, HttpServletResponse response){
+        loanProductService.redirectLoanProductUrl(request, response);
     }
 
 }

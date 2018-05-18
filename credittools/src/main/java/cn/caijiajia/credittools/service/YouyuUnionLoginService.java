@@ -47,12 +47,12 @@ public class YouyuUnionLoginService implements IProductsService {
     @Autowired
     private HttpClientTemplate httpClientTemplate;
     @Autowired
-    private LoanProductService loanProductService;
+    private LoanProductMgrService loanProductMgrService;
 
     @Override
     public UnionJumpBo unionLogin(String uid, String key) {
 
-        String jumpUrl = loanProductService.getUnionLoginUrl(key);
+        String jumpUrl = loanProductMgrService.getUnionLoginUrl(key);
         String mobile = getMobile(uid);
         DeviceInfoResp deviceInfoResp;
         DeviceEventDetailResp deviceEventDetailResp;

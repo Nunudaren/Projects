@@ -38,10 +38,15 @@ public class ErrorResponseConstants {
     public static final int USER_NOT_EXISTS_CODE = 8901;
     public static final String USER_NOT_EXISTS_MESSAGE = "用户不存在";
 
+    public static final int USER_PHONE_NOT_EXISTS_CODE = 8902;
+    public static final String USER_PHONE_NOT_EXISTS_MESSAGE = "用户手机号不存在";
+
     public static final int GET_UNION_URL_ERR_CODE = 6002;
     public static final String GET_UNION_URL_ERR_MSG = "未配置联合登录url";
 
-    public static final int UNION_LOGIN_FAILED_CODE = 6039;
-    public static final String UNION_LOGIN_FAILED_MSG = "联合登陆失败";
+    public static final int REDIRECT_FAILED_CODE = 6039;
+    public static final String REDIRECT_FAILED_MSG = "重定向失败";
+
+    public static final String LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG = "参数错误：user_id为空或不存在";
 
 }

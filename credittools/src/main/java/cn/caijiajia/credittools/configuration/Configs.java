@@ -45,4 +45,24 @@ public class Configs {
 
     @ConfElement(name = "credittools_union_login_products")
     private List<String> unionLoginProducts;
+
+    @ConfElement(name = "credittools_external_url")
+    private String externalUrl;
+    @ConfElement(name = "credittools_click_num_switch")
+    private Integer clickNumSwitch; // 0：关闭 1：打开
+
+    @ConfElement(name = "credittools_product_click_num")
+    private Map<String, Integer> productClickNum;
+
+    @ConfElement(name = "credittools_click_num_desp")
+    private String clickNumDesp;
+
+    @ConfElement(name = "credittools_client_proxy_url")
+    private String credittoolsUrl;
+
+    @ConfElement(name = "credittools_default_out_of_time")
+    private Integer defaultOutOfTime;
+
+    @ConfElement(name = "credittools_user_recommend_prop")
+    private List<String> userRecommentProp;
 }

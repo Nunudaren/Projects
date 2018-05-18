@@ -7,23 +7,23 @@
  * electronic, mechanical, photocopying, recording, or otherwise, without prior written
  * permission of Shanghai Shuhe Co., Ltd.
  */
-package cn.caijiajia.credittools.form;
+package cn.caijiajia.credittools.service.pengyuan.core;
 
-import cn.caijiajia.credittools.constant.ProductFilterTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Created by liujianyang on 2018/5/3.
+ * @Author:chendong
+ * @Date:2018/5/17
  */
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ProductListClientForm {
-    private ProductFilterTypeEnum filterType;
-    private String filterValue;
-    private String sortValue;
+@AllArgsConstructor
+public class PyRsaKeyManager implements RsaKeyManager{
+
+    private String pyPublicKey;
+    private String selfPrivateKey;
 }
