@@ -15,9 +15,11 @@ import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.credittools.common.req.ApiLoginReq;
 import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
 import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.common.req.ProductListClientReq;
+import cn.caijiajia.credittools.common.resp.ApiLoginResp;
 import cn.caijiajia.credittools.common.resp.ProductClientResp;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.configuration.Configs;
@@ -409,6 +411,10 @@ public class LoanProductService {
             optionalInfo.set(1, temp);
         }
         return optionalInfo;
+    }
+
+    public ApiLoginResp apiLogin(ApiLoginReq apiLoginReq) {
+        return null; // todo 还呗联合登陆接口
     }
 
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
