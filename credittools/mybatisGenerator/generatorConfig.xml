@@ -27,7 +27,7 @@
         <!--<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/seq"-->
         <!--userId="root" password="">-->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://172.21.7.2:3306/credittools"
+                        connectionURL="jdbc:mysql://cjjloan.crqqtvsjmosc.rds.cn-north-1.amazonaws.com.cn:3306/credittools"
                         userId="credittools" password="1qaz@WSX">
         </jdbcConnection>
 
@@ -127,7 +127,7 @@
         <!--<table tableName="pipeline_task" delimitIdentifiers="true" delimitAllColumns="true"/>-->
         <!--<table tableName="operation_log" delimitIdentifiers="true" delimitAllColumns="true"/>-->
         <!--<table tableName="user_apply_timeline" delimitIdentifiers="true" delimitAllColumns="true"/>-->
-        <table tableName="product_click_log" delimitIdentifiers="true" delimitAllColumns="true"></table>
+        <table tableName="hb_union_login_log" delimitIdentifiers="true" delimitAllColumns="true"></table>
         <!--<table tableName="tag" delimitIdentifiers="true" delimitAllColumns="true"></table>-->
 
         <!--<table tableName="user_info" delimitIdentifiers="true" delimitAllColumns="true"/>-->
