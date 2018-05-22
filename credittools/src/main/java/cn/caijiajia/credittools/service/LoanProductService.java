@@ -351,15 +351,23 @@ public class LoanProductService {
     }
 
     private List<ProductClientResp> transform(List<Product> loanProducts, Map<String, Integer> clickNum) {
+        String uid = ParameterThreadLocal.getUid();
         String credittoolsUrl = configs.getCredittoolsUrl();
         List<ProductClientResp> products = Lists.newArrayList();
         for (Product product : loanProducts) {
+            String jumpUrl = product.getJumpUrl();
+            if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
+                jumpUrl = jumpUrl + "&p_u=" + uid;
+            }
+            if(configs.getClickTimeSwitch() == 1){
+                //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
+                jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
+            }
             products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
                     .id(product.getProductId())
-                    //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
-                    .jumpUrl( credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()) + (CredittoolsConstants.HB_CHANNEL.equals(ParameterThreadLocal.getRequestChannel()) ? "&r_c=" + CredittoolsConstants.HB_CHANNEL : ""))
+                    .jumpUrl(jumpUrl)
                     .mark(product.getMark())
                     .name(product.getName())
                     .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
@@ -498,11 +506,7 @@ public class LoanProductService {
             uid = "not login user";
         }
         String id = request.getParameter("id");
-        // 非客户端进入的贷款产品连接不记录点击次数
-        String requestChannel = request.getParameter("r_c");
-        if(CredittoolsConstants.HB_CHANNEL.equals(requestChannel)){
-            taskExecutor.execute(new ClickTimeInc(uid, id));
-        }
+        taskExecutor.execute(new ClickTimeInc(uid, id));
         try {
             response.sendRedirect(getJumpUrl(Integer.valueOf(id), request.getParameter("p_u")));
         } catch (IOException e) {
