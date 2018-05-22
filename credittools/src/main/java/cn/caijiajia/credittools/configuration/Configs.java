@@ -65,4 +65,7 @@ public class Configs {
 
     @ConfElement(name = "credittools_user_recommend_prop")
     private List<String> userRecommentProp;
+
+    @ConfElement(name = "credittools_hb_union_login_url")
+    private String hbUnionLoginUrl;
 }

@@ -28,6 +28,7 @@ public class ApiLoginResp {
     private Data data;
 
     @lombok.Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Data {
