@@ -65,4 +65,7 @@ public class Configs {
 
     @ConfElement(name = "credittools_user_recommend_prop")
     private List<String> userRecommentProp;
+
+    @ConfElement(name = "credittools_click_time_switch")
+    private Integer clickTimeSwitch; // 0：关闭 1：打开
 }
