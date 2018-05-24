@@ -24,10 +24,9 @@ import cn.caijiajia.credittools.common.resp.ProductClientResp;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.ProductSortEnum;
-import cn.caijiajia.credittools.domain.Product;
-import cn.caijiajia.credittools.domain.ProductClickLog;
-import cn.caijiajia.credittools.domain.ProductClickLogExample;
-import cn.caijiajia.credittools.domain.ProductExample;
+import cn.caijiajia.credittools.delegator.UserDelegator;
+import cn.caijiajia.credittools.domain.*;
+import cn.caijiajia.credittools.mapper.HbUnionLoginLogMapper;
 import cn.caijiajia.credittools.mapper.ProductClickLogMapper;
 import cn.caijiajia.credittools.mapper.ProductMapper;
 import cn.caijiajia.credittools.utils.MoneyUtil;
@@ -81,6 +80,9 @@ public class LoanProductService {
     private UserRpc userRpc;
 
     @Autowired
+    private UserDelegator userDelegator;
+
+    @Autowired
     private UnionLoginLogService unionLoginLogService;
 
     @Autowired
@@ -91,6 +93,9 @@ public class LoanProductService {
 
     @Autowired
     private ProductClickLogMapper productClickLogMapper;
+
+    @Autowired
+    private HbUnionLoginLogMapper hbUnionLoginLogMapper;
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
@@ -346,15 +351,23 @@ public class LoanProductService {
     }
 
     private List<ProductClientResp> transform(List<Product> loanProducts, Map<String, Integer> clickNum) {
+        String uid = ParameterThreadLocal.getUid();
         String credittoolsUrl = configs.getCredittoolsUrl();
         List<ProductClientResp> products = Lists.newArrayList();
         for (Product product : loanProducts) {
+            String jumpUrl = product.getJumpUrl();
+            if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
+                jumpUrl = jumpUrl + "&p_u=" + uid;
+            }
+            if(configs.getClickTimeSwitch() == 1){
+                //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
+                jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
+            }
             products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
                     .id(product.getProductId())
-                    //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
-                    .jumpUrl( credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (ParameterThreadLocal.getUid() == null ? "" : "&p_u=" + ParameterThreadLocal.getUid()) + (CredittoolsConstants.HB_CHANNEL.equals(ParameterThreadLocal.getRequestChannel()) ? "&r_c=" + CredittoolsConstants.HB_CHANNEL : ""))
+                    .jumpUrl(jumpUrl)
                     .mark(product.getMark())
                     .name(product.getName())
                     .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
@@ -414,7 +427,35 @@ public class LoanProductService {
     }
 
     public ApiLoginResp apiLogin(ApiLoginReq apiLoginReq) {
-        return null; // todo 还呗联合登陆接口
+
+        try {
+            Boolean isExisted = false;
+            UserVo userVo = userRpc.getUserInfoByMobileAllStatus(apiLoginReq.getMobile());
+            if (userVo != null) {
+                isExisted = true;
+            }
+
+            // 免密注册
+            userDelegator.noPasswordRegister(apiLoginReq.getMobile());
+
+            // 落表
+            HbUnionLoginLog hbUnionLoginLog = new HbUnionLoginLog();
+            hbUnionLoginLog.setChannel(ParameterThreadLocal.getRequestChannel());
+            hbUnionLoginLog.setExisted(isExisted);
+            hbUnionLoginLog.setMobile(apiLoginReq.getMobile());
+            hbUnionLoginLogMapper.insert(hbUnionLoginLog);
+
+            // TODO: 2018/5/22 过准入、黑名单
+
+            return ApiLoginResp.builder().code(200)
+                        .data(ApiLoginResp.Data.builder().existed(isExisted).loginUrl(configs.getHbUnionLoginUrl()).build())
+                        .build();
+        } catch (Exception e) {
+            log.error("api union login error, api login req: {} " + JSON.toJSONString(apiLoginReq), e);
+            return ApiLoginResp.builder().code(400)
+                    .msg(e.getMessage())
+                    .build();
+        }
     }
 
     public void unionLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -465,11 +506,7 @@ public class LoanProductService {
             uid = "not login user";
         }
         String id = request.getParameter("id");
-        // 非客户端进入的贷款产品连接不记录点击次数
-        String requestChannel = request.getParameter("r_c");
-        if(CredittoolsConstants.HB_CHANNEL.equals(requestChannel)){
-            taskExecutor.execute(new ClickTimeInc(uid, id));
-        }
+        taskExecutor.execute(new ClickTimeInc(uid, id));
         try {
             response.sendRedirect(getJumpUrl(Integer.valueOf(id), request.getParameter("p_u")));
         } catch (IOException e) {
