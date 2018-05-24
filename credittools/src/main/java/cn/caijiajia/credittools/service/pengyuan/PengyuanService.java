@@ -15,6 +15,7 @@ import cn.caijiajia.userloan.common.resp.UserResp;
 import cn.caijiajia.userloan.rpc.UserInfoRpc;
 import cn.caijiajia.utils.crypto.Base64Utils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +70,10 @@ public class PengyuanService implements IProductsService {
             PhotoSupplierDataResp photoSupplierDataResp = photoSupplierRpc.getUserPhotos(uid);
             if (photoSupplierDataResp != null) {
                 List<String> photos = photoSupplierDataResp.getLivePhotos();
-                if (photos.size() > 0 && !StringUtils.isEmpty(photos.get(0))) {
-                    photoUrl = hostUrl + "/image?token=" + photos.get(0) + "&bucketName=" + photoSupplierDataResp.getBucketName();
+                if (!CollectionUtils.isEmpty(photos)) {
+                    if (photos.size() > 0 && !StringUtils.isEmpty(photos.get(0))) {
+                        photoUrl = hostUrl + "/image?token=" + photos.get(0) + "&bucketName=" + photoSupplierDataResp.getBucketName();
+                    }
                 }
             }
             //活体照片
@@ -79,8 +82,12 @@ public class PengyuanService implements IProductsService {
             FaceVerifyDataResp resp = photoSupplierRpc.getFaceVerifyData(uid, null);
             if (resp != null) {
                 //活体来源
-                extendInfo.setLivingBodySource("sht".equals(resp.getSupplier().getCode()) ? "shangtang" : "face++");
-                extendInfo.setConfidence(Base64Utils.encodeBase64String(resp.getVerifyScore().getBytes()));
+                if (resp.getSupplier() != null) {
+                    extendInfo.setLivingBodySource("sht".equals(resp.getSupplier().getCode()) ? "shangtang" : "face++");
+                }
+                if (resp.getVerifyScore() != null) {
+                    extendInfo.setConfidence(Base64Utils.encodeBase64String(resp.getVerifyScore().getBytes()));
+                }
             }
 
             extendInfo.setThresholdLevel("0.6"); //阈值给固定值

@@ -48,6 +48,7 @@ public class Configs {
 
     @ConfElement(name = "credittools_external_url")
     private String externalUrl;
+
     @ConfElement(name = "credittools_click_num_switch")
     private Integer clickNumSwitch; // 0：关闭 1：打开
 
