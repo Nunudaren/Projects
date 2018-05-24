@@ -9,18 +9,21 @@
  */
 package cn.caijiajia.credittools.controller;
 
+import cn.caijiajia.credittools.common.req.ApiLoginReq;
 import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
 import cn.caijiajia.credittools.common.req.ProductListClientReq;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 
 /**
@@ -51,6 +54,16 @@ public class LoanProductController {
     }
 
     /**
+     * 还呗提供接口，联合登陆
+     *
+     * @param apiLoginReq
+     */
+    @RequestMapping(value = "/api/login", method = RequestMethod.POST)
+    public void apiLogin(@RequestBody @Valid ApiLoginReq apiLoginReq) {
+        loanProductService.apiLogin(apiLoginReq);
+    }
+
+    /**
      * 贷款产品联合登陆
      *
      * @param request
@@ -65,11 +78,6 @@ public class LoanProductController {
     public void checkUser(Lattery9188CheckUserReq lattery9188CheckUserReq,HttpServletResponse response) throws IOException {
         String checkUser = loanProductService.checkUser(lattery9188CheckUserReq);
         response.getWriter().write(checkUser);
-    }
-
-    @RequestMapping(value = "/lottery9188/unionLoginRedirect", method = RequestMethod.GET)
-    public void lattery9188UnionLoginRedirect(HttpServletRequest request, HttpServletResponse response) {
-        loanProductService.unionLogin(request, response);
     }
 
     /**
