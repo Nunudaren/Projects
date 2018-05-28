@@ -1,9 +1,13 @@
 package cn.caijiajia.credittools.service;
 
 import cn.caijiajia.credittools.bo.UnionJumpBo;
+import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
 import cn.caijiajia.credittools.utils.MD5Utils;
+import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.httpclient.HttpClientTemplate;
+import cn.caijiajia.user.common.resp.UserVo;
+import cn.caijiajia.user.rpc.UserRpc;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.util.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,8 @@ import java.util.Map;
 public class Lottery9188UnionLoginService implements IProductsService {
     @Autowired
     private LoanProductMgrService loanProductMgrService;
+    @Autowired
+    private UserRpc userRpc;
 
     private static final String SIGN_TYPE = "MD5";
     private static final String _INPUT_CHARSET = "UTF-8";
@@ -36,11 +42,13 @@ public class Lottery9188UnionLoginService implements IProductsService {
     public UnionJumpBo unionLogin(String uid, String key) {
         String url;
         try {
+            String mobile = getMobile(uid);
             Map<String, String> signMap = Maps.newHashMap();
             signMap.put("time_key", System.currentTimeMillis() + 3 * 60 * 60 * 1000 + "");
             signMap.put("user_id", uid);
             signMap.put("partner", partner);
             signMap.put("_input_charset", _INPUT_CHARSET);
+            signMap.put("mobileNo",mobile);
 
             String signStr = MD5Utils.getFormDataParamMD5(signMap);
             String sign = MD5Utils.sign(signStr, lottery9188MD5Key, _INPUT_CHARSET);
@@ -60,5 +68,14 @@ public class Lottery9188UnionLoginService implements IProductsService {
     @Override
     public String getChannelName() {
         return UnionLoginChannelEnum.LOTTERY9188.toString();
+    }
+
+    private String getMobile(String uid){
+        UserVo userInfo = userRpc.getUserInfo(uid);
+        if(userInfo == null){
+            log.warn("没有找到该用户,uid:{}", uid);
+            throw new CjjClientException(ErrorResponseConstants.USER_NOT_EXISTS_CODE, ErrorResponseConstants.USER_NOT_EXISTS_MESSAGE);
+        }
+        return userInfo.getMobile();
     }
 }
