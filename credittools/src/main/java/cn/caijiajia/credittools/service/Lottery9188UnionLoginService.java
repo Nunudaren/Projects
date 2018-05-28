@@ -49,10 +49,10 @@ public class Lottery9188UnionLoginService implements IProductsService {
             signMap.put("partner", partner);
             signMap.put("_input_charset", _INPUT_CHARSET);
             signMap.put("mobileNo",mobile);
-
             String signStr = MD5Utils.getFormDataParamMD5(signMap);
-            String sign = MD5Utils.sign(signStr, lottery9188MD5Key, _INPUT_CHARSET);
+            log.info("9188彩票联合登录参数：" + signStr);
 
+            String sign = MD5Utils.sign(signStr, lottery9188MD5Key, _INPUT_CHARSET);
             StringBuilder reqStr = new StringBuilder();
             reqStr.append(signStr).append("&sign=").append(sign).append("&sign_type=").append(SIGN_TYPE);
 
