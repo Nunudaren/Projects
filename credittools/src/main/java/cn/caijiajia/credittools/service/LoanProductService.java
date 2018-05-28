@@ -363,6 +363,9 @@ public class LoanProductService {
                 //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
                 jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
             }
+            if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
+                jumpUrl = jumpUrl + "&__openInExternal=1";
+            }
             products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
