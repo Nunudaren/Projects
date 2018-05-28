@@ -15,9 +15,9 @@ import cn.caijiajia.credittools.bo.UnionJumpBo;
 import cn.caijiajia.credittools.bo.UnionLoginBo;
 import cn.caijiajia.credittools.common.constant.CredittoolsConstants;
 import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
+import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.common.req.ApiLoginReq;
 import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
-import cn.caijiajia.credittools.common.constant.ProductFilterTypeEnum;
 import cn.caijiajia.credittools.common.req.ProductListClientReq;
 import cn.caijiajia.credittools.common.resp.ApiLoginResp;
 import cn.caijiajia.credittools.common.resp.ProductClientResp;
@@ -49,10 +49,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.jedis.JedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -234,7 +230,10 @@ public class LoanProductService {
         if (1 == configs.getClickNumSwitch()) {
             productUserNum = configs.getProductClickNum();
         }
-        List<ProductClickNumBo> productClickNum = getProductClickNum();
+        if (1 != configs.getClickTimeShowSwitch()) {
+            return productUserNum;
+        }
+        List<ProductClickNumBo> productClickNum = getProductClickNum(); // todo: sql 待优化
         if(CollectionUtils.isEmpty(productClickNum)){
             return productUserNum;
         }
@@ -362,6 +361,9 @@ public class LoanProductService {
             if(configs.getClickTimeSwitch() == 1){
                 //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
                 jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
+            }
+            if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
+                jumpUrl = jumpUrl + "&__openInExternal=1";
             }
             products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
