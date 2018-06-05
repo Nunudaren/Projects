@@ -33,4 +33,6 @@ public class UnionLoginReq {
 
     private String lbsLocation; // 经纬度信息
 
+    private String timestamp;    //时间戳
+
 }
