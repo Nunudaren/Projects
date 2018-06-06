@@ -10,10 +10,12 @@
 package cn.caijiajia.credittools.rpc.service;
 
 import cn.caijiajia.credittools.common.req.ProductListClientReq;
+import cn.caijiajia.credittools.common.resp.ProductClientResp;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.framework.rpc.BaseRpc;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,8 @@ public class CredittoolsService extends BaseRpc{
 
     private static final String GET_LOAN_PRODUCT_LIST = "/getLoanProductList";
 
+    private static final String GET_LOAN_PRODUCT_DETAIL = "/getLoanProduct/%s";
+
     public ProductListClientResp getLoanProductList(ProductListClientReq productListClientReq){
         Map<String, String> param = Maps.newHashMap();
         param.put("filterType", productListClientReq.getFilterType().toString());
@@ -37,6 +41,14 @@ public class CredittoolsService extends BaseRpc{
         param.put("sortValue", productListClientReq.getSortValue());
 
         return JSON.parseObject(getHttpClient().doGet(credittoolsUrl + GET_LOAN_PRODUCT_LIST, param), ProductListClientResp.class);
+    }
+
+    public ProductClientResp getProductDetail(Integer id){
+        String product = getHttpClient().doGet(credittoolsUrl + String.format(GET_LOAN_PRODUCT_DETAIL, id));
+        if(StringUtils.isEmpty(product)){
+            return null;
+        }
+        return JSON.parseObject(product, ProductClientResp.class);
     }
 
 }
