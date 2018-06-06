@@ -12,14 +12,12 @@ package cn.caijiajia.credittools.controller;
 import cn.caijiajia.credittools.common.req.ApiLoginReq;
 import cn.caijiajia.credittools.common.req.Lattery9188CheckUserReq;
 import cn.caijiajia.credittools.common.req.ProductListClientReq;
+import cn.caijiajia.credittools.common.resp.ProductClientResp;
 import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.service.LoanProductService;
 import cn.caijiajia.credittools.vo.LoanProductFilterVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -86,6 +84,14 @@ public class LoanProductController {
     @RequestMapping(value = "/redirectUrl", method = RequestMethod.GET)
     public void redirectUrl(HttpServletRequest request, HttpServletResponse response){
         loanProductService.redirectLoanProductUrl(request, response);
+    }
+
+    /**
+     * 贷款产品详情
+     */
+    @RequestMapping(value = "/getLoanProduct/{id}", method = RequestMethod.GET)
+    public ProductClientResp getLoanProduct(@PathVariable Integer id){
+        return loanProductService.getProductDetail(id);
     }
 
 }

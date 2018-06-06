@@ -350,21 +350,9 @@ public class LoanProductService {
     }
 
     private List<ProductClientResp> transform(List<Product> loanProducts, Map<String, Integer> clickNum) {
-        String uid = ParameterThreadLocal.getUid();
-        String credittoolsUrl = configs.getCredittoolsUrl();
         List<ProductClientResp> products = Lists.newArrayList();
         for (Product product : loanProducts) {
-            String jumpUrl = product.getJumpUrl();
-            if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
-                jumpUrl = jumpUrl + "&p_u=" + uid;
-            }
-            if(configs.getClickTimeSwitch() == 1){
-                //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
-                jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
-            }
-            if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
-                jumpUrl = jumpUrl + "&__openInExternal=1";
-            }
+            String jumpUrl = getJumpUrl(product);
             products.add(ProductClientResp.builder()
                     .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                     .iconUrl(product.getIconUrl())
@@ -383,6 +371,23 @@ public class LoanProductService {
                     .build());
         }
         return products;
+    }
+
+    private String getJumpUrl(Product product){
+        String uid = ParameterThreadLocal.getUid();
+        String credittoolsUrl = configs.getCredittoolsUrl();
+        String jumpUrl = product.getJumpUrl();
+        if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
+            jumpUrl = jumpUrl + "&p_u=" + uid;
+        }
+        if(configs.getClickTimeSwitch() == 1){
+            //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
+            jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
+        }
+        if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
+            jumpUrl = jumpUrl + "&__openInExternal=1";
+        }
+        return jumpUrl;
     }
 
     private String formatClickNumStr(Integer num) {
@@ -545,6 +550,26 @@ public class LoanProductService {
             return  product.getJumpUrl() + "&p_u=" + uid;
         }
         return product.getJumpUrl();
+    }
+
+    public ProductClientResp getProductDetail(Integer id){
+        Product product = productMapper.selectByPrimaryKey(id);
+        if(product == null){
+            return null;
+        }
+        String jumpUrl = getJumpUrl(product);
+        Map<String, Integer> clickNum = getClickNumMap();
+        return  ProductClientResp.builder()
+                .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
+                .iconUrl(product.getIconUrl())
+                .id(product.getProductId())
+                .jumpUrl(jumpUrl)
+                .mark(product.getMark())
+                .name(product.getName())
+                .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
+                .promotion(product.getPromotion())
+                .optionalInfo(Lists.newArrayList(Collections2.transform(buildOptionalInfo(product), input -> ProductClientResp.OptionalInfo.builder().type(input.getType()).value(input.getValue()).build())))
+                .build();
     }
 
 }
