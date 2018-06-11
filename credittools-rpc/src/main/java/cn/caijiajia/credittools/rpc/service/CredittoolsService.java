@@ -36,7 +36,7 @@ public class CredittoolsService extends BaseRpc{
 
     public ProductListClientResp getLoanProductList(ProductListClientReq productListClientReq){
         Map<String, String> param = Maps.newHashMap();
-        param.put("filterType", productListClientReq.getFilterType().toString());
+        param.put("filterType", productListClientReq.getFilterType()==null ? "" : productListClientReq.getFilterType().toString());
         param.put("filterValue", productListClientReq.getFilterValue());
         param.put("sortValue", productListClientReq.getSortValue());
 

@@ -389,6 +389,9 @@ public class LoanProductService {
         if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
             jumpUrl = jumpUrl + "&__openInExternal=1";
         }
+        if(configs.getUnionLoginProducts().contains(product.getProductId())){
+            jumpUrl = HB_RELATIVE_URL + jumpUrl;
+        }
         return jumpUrl;
     }
 
@@ -551,9 +554,6 @@ public class LoanProductService {
         String jumpUrl = product.getJumpUrl();
         if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
             return  jumpUrl + "&p_u=" + uid;
-        }
-        if(configs.getUnionLoginProducts().contains(product.getProductId())){
-            jumpUrl = HB_RELATIVE_URL + jumpUrl;
         }
         return jumpUrl;
     }
