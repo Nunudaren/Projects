@@ -43,8 +43,8 @@ public class CredittoolsService extends BaseRpc{
         return JSON.parseObject(getHttpClient().doGet(credittoolsUrl + GET_LOAN_PRODUCT_LIST, param), ProductListClientResp.class);
     }
 
-    public ProductClientResp getProductDetail(Integer id){
-        String product = getHttpClient().doGet(credittoolsUrl + String.format(GET_LOAN_PRODUCT_DETAIL, id));
+    public ProductClientResp getProductDetail(String productId){
+        String product = getHttpClient().doGet(credittoolsUrl + String.format(GET_LOAN_PRODUCT_DETAIL, productId));
         if(StringUtils.isEmpty(product)){
             return null;
         }

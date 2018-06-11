@@ -558,11 +558,15 @@ public class LoanProductService {
         return jumpUrl;
     }
 
-    public ProductClientResp getProductDetail(Integer id){
-        Product product = productMapper.selectByPrimaryKey(id);
-        if(product == null){
+    public ProductClientResp getProductDetail(String productId){
+        ProductExample productExample = new ProductExample();
+        productExample.createCriteria().andProductIdEqualTo(productId);
+        List<Product> products = productMapper.selectByExample(productExample);
+        if(CollectionUtils.isEmpty(products)){
             return null;
         }
+        Product product = products.get(0);
+
         String jumpUrl = getJumpUrl(product);
         Map<String, Integer> clickNum = getClickNumMap();
         return  ProductClientResp.builder()

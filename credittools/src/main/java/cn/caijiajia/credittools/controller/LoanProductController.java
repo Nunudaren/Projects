@@ -89,9 +89,9 @@ public class LoanProductController {
     /**
      * 贷款产品详情
      */
-    @RequestMapping(value = "/getLoanProduct/{id}", method = RequestMethod.GET)
-    public ProductClientResp getLoanProduct(@PathVariable Integer id){
-        return loanProductService.getProductDetail(id);
+    @RequestMapping(value = "/getLoanProduct/{productId}", method = RequestMethod.GET)
+    public ProductClientResp getLoanProduct(@PathVariable String productId){
+        return loanProductService.getProductDetail(productId);
     }
 
 }
