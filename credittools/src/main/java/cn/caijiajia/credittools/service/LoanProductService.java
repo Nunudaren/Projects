@@ -99,7 +99,9 @@ public class LoanProductService {
     @Autowired
     private RedisClient redisClient;
 
-    public static final String REDIRECT_URL = "/redirectUrl";
+    private static final String REDIRECT_URL = "/redirectUrl";
+
+    public static final String HB_RELATIVE_URL = "huanbei://lc/wm?relativeUrl=";
 
     public LoanProductFilterVo getLoanProductFilter() {
         LoanProductFilterVo rtnVo = new LoanProductFilterVo();
@@ -386,6 +388,9 @@ public class LoanProductService {
         }
         if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
             jumpUrl = jumpUrl + "&__openInExternal=1";
+        }
+        if(configs.getUnionLoginProducts().contains(product.getProductId())){
+            jumpUrl = HB_RELATIVE_URL + jumpUrl;
         }
         return jumpUrl;
     }
