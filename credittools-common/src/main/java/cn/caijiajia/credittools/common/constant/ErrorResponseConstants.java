@@ -49,4 +49,7 @@ public class ErrorResponseConstants {
 
     public static final String LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG = "参数错误：user_id为空或不存在";
 
+    public static final int REQUEST_TOKEN_FAIL_CODE = 7000;
+    public static final String REQUEST_TOKEN_FAIL_MSG = "点融魔借授权token接口异常";
+
 }

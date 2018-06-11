@@ -38,6 +38,10 @@ public class ProductsFactory {
                 break;
             case "jinniu":
                 clz = JinniuService.class;
+                break;
+            case "dianrongmojie":
+                clz = DianrongUnionLoginService.class;
+                break;
         }
         return (T)ContextLoader.getCurrentWebApplicationContext().getBean(clz);
     }
