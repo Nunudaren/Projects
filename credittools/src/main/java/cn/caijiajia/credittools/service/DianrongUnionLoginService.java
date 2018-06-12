@@ -14,6 +14,7 @@ import cn.caijiajia.credittools.common.constant.ErrorResponseConstants;
 import cn.caijiajia.credittools.common.req.DianrongRegisterReq;
 import cn.caijiajia.credittools.common.resp.DianrongGetTokenResp;
 import cn.caijiajia.credittools.common.resp.DianrongRegisterResp;
+import cn.caijiajia.credittools.configuration.Configs;
 import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
 import cn.caijiajia.credittools.utils.CommonUtil;
 import cn.caijiajia.framework.exceptions.CjjClientException;
@@ -57,17 +58,18 @@ public class DianrongUnionLoginService implements IProductsService {
     private String channelTokenReqUrl;
     @Value("${dianrong.channel.registration.url}")
     private String registerUrl;
-    @Value("${dianrong.union.login.success.url}")
-    private String unionLoginSuccessUrl;
     @Autowired
     private UserRpc userRpc;
     @Autowired
     private LoanProductMgrService loanProductMgrService;
     @Autowired
     private HttpClientTemplate httpClient;
+    @Autowired
+    private Configs configs;
 
     /**
      * 获取授权token -> 用户注册
+     *
      * @param uid
      * @param key
      * @return
@@ -75,13 +77,15 @@ public class DianrongUnionLoginService implements IProductsService {
     @Override
     public UnionJumpBo unionLogin(String uid, String key) {
 
+        String unionLoginSuccessUrl = configs.getDianrongUnionLoginSuccessUrl();
+
         UnionJumpBo jumpBo = UnionJumpBo.builder().jumpUrl(loanProductMgrService.getUnionLoginUrl(key)).build();
 
         DianrongGetTokenResp dianrongGetTokenResp;
         try {
             dianrongGetTokenResp = getTokenContent();
         } catch (Exception e) {
-           return jumpBo;
+            return jumpBo;
         }
         String token = null;
         if ("success".equals(dianrongGetTokenResp.getResult()) && dianrongGetTokenResp.getContent() != null) {
@@ -107,7 +111,6 @@ public class DianrongUnionLoginService implements IProductsService {
 
         String resultParam = null;
         try {
-
             String requestBody = JSON.toJSONString(dianrongRegisterReq, SerializerFeature.DisableCircularReferenceDetect);
             StringEntity httpEntity = new StringEntity(requestBody, GlobalConstants.DEFAULT_CHARSET);
             resultParam = httpClient.doPost(registerReqUrl, ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8), httpEntity, requestBody, httpHeaders);
@@ -131,6 +134,7 @@ public class DianrongUnionLoginService implements IProductsService {
 
     /**
      * 获取授权token
+     *
      * @return
      */
     public DianrongGetTokenResp getTokenContent() {

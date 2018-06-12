@@ -81,4 +81,7 @@ public class Configs {
 
     @ConfElement(name = "credittools_force_login")
     private List<String> forceLogin;
+
+    @ConfElement(name="dianrong_union_login_success_url")
+    private String dianrongUnionLoginSuccessUrl;
 }
