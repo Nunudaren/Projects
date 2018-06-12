@@ -18,11 +18,16 @@ import cn.caijiajia.credittools.constant.UnionLoginChannelEnum;
 import cn.caijiajia.credittools.utils.CommonUtil;
 import cn.caijiajia.framework.exceptions.CjjClientException;
 import cn.caijiajia.framework.exceptions.CjjServerException;
+import cn.caijiajia.framework.global.GlobalConstants;
 import cn.caijiajia.framework.httpclient.HttpClientTemplate;
 import cn.caijiajia.user.common.resp.UserVo;
 import cn.caijiajia.user.rpc.UserRpc;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Consts;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.assertj.core.util.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -102,7 +107,10 @@ public class DianrongUnionLoginService implements IProductsService {
 
         String resultParam = null;
         try {
-            resultParam = httpClient.doPost(registerReqUrl, dianrongRegisterReq, httpHeaders);
+
+            String requestBody = JSON.toJSONString(dianrongRegisterReq, SerializerFeature.DisableCircularReferenceDetect);
+            StringEntity httpEntity = new StringEntity(requestBody, GlobalConstants.DEFAULT_CHARSET);
+            resultParam = httpClient.doPost(registerReqUrl, ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8), httpEntity, requestBody, httpHeaders);
         } catch (Exception e) {
             log.warn("register failed! resultParam: " + resultParam);
             return jumpBo;
