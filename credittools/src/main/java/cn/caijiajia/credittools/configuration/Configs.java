@@ -78,4 +78,7 @@ public class Configs {
 
     @ConfElement(name = "credittools_open_in_external")
     private List<Integer> openInExternal;
+
+    @ConfElement(name = "credittools_force_login")
+    private List<String> forceLogin;
 }

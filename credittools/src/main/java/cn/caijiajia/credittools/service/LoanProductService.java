@@ -389,7 +389,7 @@ public class LoanProductService {
         if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
             jumpUrl = jumpUrl + "&__openInExternal=1";
         }
-        if(configs.getUnionLoginProducts().contains(product.getProductId())){
+        if(configs.getForceLogin().contains(product.getProductId())){
             jumpUrl = HB_RELATIVE_URL + jumpUrl;
         }
         return jumpUrl;
