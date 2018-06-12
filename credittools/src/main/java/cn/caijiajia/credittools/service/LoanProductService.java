@@ -575,13 +575,12 @@ public class LoanProductService {
         }
         Product product = products.get(0);
 
-        String jumpUrl = getJumpUrl(product);
         Map<String, Integer> clickNum = getClickNumMap();
         return  ProductClientResp.builder()
                 .feeRate(product.getShowFeeRate() ? product.getFeeRate() : null)
                 .iconUrl(product.getIconUrl())
                 .id(product.getProductId())
-                .jumpUrl(jumpUrl)
+                .jumpUrl(product.getJumpUrl())
                 .mark(product.getMark())
                 .name(product.getName())
                 .clickNum(formatClickNumStr(clickNum.get(product.getProductId())))
