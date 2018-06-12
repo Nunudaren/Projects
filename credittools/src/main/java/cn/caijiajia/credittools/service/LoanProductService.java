@@ -55,7 +55,9 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -384,15 +386,19 @@ public class LoanProductService {
         }
         if(configs.getClickTimeSwitch() == 1){
             //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
-            //https%3A%2F%2Fclientproxy.sit.lattebank.com%2Fcredittools%2FredirectUrl%3Fid%3D22%26p_u%3Db0745db1-fffc-43ef-a534-1fa28c0cba95
             jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
         }
         if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
             jumpUrl = jumpUrl + "&__openInExternal=1";
         }
         if(configs.getForceLogin().contains(product.getProductId())){
-            String jump = jumpUrl.replaceAll("/", "%2F").replaceAll(":", "%3A").replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
-            jumpUrl = HB_RELATIVE_URL + jump;
+            try {
+                jumpUrl = URLEncoder.encode(jumpUrl, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                log.warn("URL编码异常");
+                throw new CjjClientException(ErrorResponseConstants.ENCODE_ERROR_CODE, ErrorResponseConstants.ENCODE_ERROR_MSG);
+            }
+            jumpUrl = HB_RELATIVE_URL + jumpUrl;
         }
         return jumpUrl;
     }
