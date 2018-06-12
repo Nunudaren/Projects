@@ -99,7 +99,7 @@ public class LoanProductService {
     @Autowired
     private RedisClient redisClient;
 
-    private static final String REDIRECT_URL = "/redirectUrl";
+    private static final String REDIRECT_URL = "%2FredirectUrl";
 
     public static final String HB_RELATIVE_URL = "huanbei://lc/wm?relativeUrl=";
 
@@ -380,14 +380,15 @@ public class LoanProductService {
         String credittoolsUrl = configs.getCredittoolsUrl();
         String jumpUrl = product.getJumpUrl();
         if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
-            jumpUrl = jumpUrl + "&p_u=" + uid;
+            jumpUrl = jumpUrl + "%26p_u=" + uid;
         }
         if(configs.getClickTimeSwitch() == 1){
             //拼接跳转的url，id定位贷款产品，p_u定位用户, r_c定位是否为推广页面
-            jumpUrl = credittoolsUrl + REDIRECT_URL + "?id=" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "&p_u=" + uid);
+            //https%3A%2F%2Fclientproxy.sit.lattebank.com%2Fcredittools%2FredirectUrl%3Fid%3D22%26p_u%3Db0745db1-fffc-43ef-a534-1fa28c0cba95
+            jumpUrl = credittoolsUrl + REDIRECT_URL + "%3Fid%3D" + product.getId() + (StringUtils.isEmpty(uid) ? "" : "%26p_u%3D" + uid);
         }
         if ("a".equals(ParameterThreadLocal.getOs()) && configs.getOpenInExternal() != null && configs.getOpenInExternal().contains(product.getId())) {
-            jumpUrl = jumpUrl + "&__openInExternal=1";
+            jumpUrl = jumpUrl + "%26__openInExternal=1";
         }
         if(configs.getForceLogin().contains(product.getProductId())){
             jumpUrl = HB_RELATIVE_URL + jumpUrl;
@@ -553,7 +554,7 @@ public class LoanProductService {
         }
         String jumpUrl = product.getJumpUrl();
         if(configs.getUnionLoginProducts().contains(product.getProductId()) && StringUtils.isNotEmpty(uid)){
-            return  jumpUrl + "&p_u=" + uid;
+            return  jumpUrl + "%26p_u=" + uid;
         }
         return jumpUrl;
     }
