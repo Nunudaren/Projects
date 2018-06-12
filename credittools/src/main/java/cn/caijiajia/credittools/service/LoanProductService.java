@@ -391,7 +391,7 @@ public class LoanProductService {
             jumpUrl = jumpUrl + "&__openInExternal=1";
         }
         if(configs.getForceLogin().contains(product.getProductId())){
-            String jump = jumpUrl.replaceAll("/", "%2F").replaceAll(":", "%3A").replaceAll("\\?", "%3F").replaceAll("&", "%3D");
+            String jump = jumpUrl.replaceAll("/", "%2F").replaceAll(":", "%3A").replaceAll("\\?", "%3F").replaceAll("&", "%26").replaceAll("=", "%3D");
             jumpUrl = HB_RELATIVE_URL + jump;
         }
         return jumpUrl;
