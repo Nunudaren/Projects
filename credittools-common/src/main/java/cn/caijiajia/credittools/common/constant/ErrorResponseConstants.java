@@ -49,4 +49,7 @@ public class ErrorResponseConstants {
 
     public static final String LOTTERY9188_CHECKUSER_REQPARAM_ERROR_MSG = "参数错误：user_id为空或不存在";
 
+    public static final int ENCODE_ERROR_CODE = 6041;
+    public static final String ENCODE_ERROR_MSG = "请求URL转义失败";
+
 }
