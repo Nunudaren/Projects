@@ -52,4 +52,7 @@ public class ErrorResponseConstants {
     public static final int ENCODE_ERROR_CODE = 6041;
     public static final String ENCODE_ERROR_MSG = "请求URL转义失败";
 
+    public static final int REQUEST_TOKEN_FAIL_CODE = 7000;
+    public static final String REQUEST_TOKEN_FAIL_MSG = "点融魔借授权token接口异常";
+
 }
