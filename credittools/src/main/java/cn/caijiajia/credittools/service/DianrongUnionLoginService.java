@@ -115,7 +115,7 @@ public class DianrongUnionLoginService implements IProductsService {
             StringEntity httpEntity = new StringEntity(requestBody, GlobalConstants.DEFAULT_CHARSET);
             resultParam = httpClient.doPost(registerReqUrl, ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8), httpEntity, requestBody, httpHeaders);
         } catch (Exception e) {
-            log.warn("register failed! resultParam: " + resultParam);
+            log.warn("register failed! resultParam: " + resultParam, e);
             return jumpBo;
         }
 
@@ -145,7 +145,7 @@ public class DianrongUnionLoginService implements IProductsService {
         try {
             resultParam = httpClient.doGet(channelTokenReqUrl, reqParm);
         } catch (Exception e) {
-            log.warn("request channel authorization token failed! " + resultParam);
+            log.warn("request channel authorization token failed! resultParam: " + resultParam, e);
             throw new CjjServerException(ErrorResponseConstants.REQUEST_TOKEN_FAIL_CODE, ErrorResponseConstants.REQUEST_TOKEN_FAIL_MSG);
         }
         DianrongGetTokenResp dianrongGetTokenResp = JSON.parseObject(resultParam, DianrongGetTokenResp.class);
