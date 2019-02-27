@@ -14,10 +14,16 @@ import cn.caijiajia.credittools.common.resp.ProductListClientResp;
 import cn.caijiajia.credittools.form.RankForm;
 import cn.caijiajia.credittools.rpc.service.CredittoolsService;
 import cn.caijiajia.credittools.service.LoanProductMgrService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.qiniu.util.Json;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -50,7 +56,21 @@ public class LocalTestController {
 
 
     public static void main(String[] args) {
+        Date now = new Date();
+        DateTime startTimeOfDay = new DateTime(now).withTimeAtStartOfDay();
+        System.out.println(startTimeOfDay);
+        System.out.println(startTimeOfDay.plusHours(12).toDate());
+        boolean isMorning = now.before(startTimeOfDay.plusHours(12).toDate());
+        boolean isNight = now.after(startTimeOfDay.plusHours(12).toDate());
+        System.out.println(isMorning + " " + isNight);
 
+
+        byte[] b = "ni hao".getBytes();
+        System.out.println(b.length);
+
+        String birth = "{\"month\":\"11\",\"year\":\"1985\",\"day\":\"27\"}";
+        JSONObject birth1 = JSON.parseObject(birth);
+        System.out.println(birth1.get("year") + "-" + birth1.get("month") + "-" + birth1.get("day"));
     }
 
     @RequestMapping(value = "/test/getLoanProductList", method = GET)

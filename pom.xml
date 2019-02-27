@@ -17,6 +17,7 @@
 		<module>credittools-rpc</module>
 		<module>credittools</module>
 		<module>credittools-common</module>
+		<module>training-module</module>
 	</modules>
 
 	<properties>
@@ -334,6 +335,11 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>4.1.7.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka-clients</artifactId>
+				<version>${project.release.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
